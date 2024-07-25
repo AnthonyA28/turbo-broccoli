@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serial Port Communication</title>
+  <style>
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+.container {
+  text-align: center;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#hiddenSection {
+    display: block; /* Initially visible */
+    transition: opacity 0.5s ease; /* Smooth transition for disappearance */
+}
+#hiddenSection.locked {
+    opacity: 0.5; /* Fades out */
+    pointer-events: none; /* Disables interaction */
+}
+
+
+#serialPortForm {
+    display: block;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.container {
+    display: block;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+button {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 1px 20px; /* Padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* No underline */
+    display: inline-block; /* Inline block element */
+    font-size: 16px; /* Font size */
+    margin: 4px 2px; /* Margin */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 4px; /* Rounded corners */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+input[type="text"], input[type="number"] {
+    width: calc(100% - 22px); /* Full width minus padding */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+  </style>
+</head>
+
+
+<body>
+<form id="serialPortForm">
+    <div id="hiddenSection">
+        <label for="path">Path:</label>
+        <select id="portSelect">
+            <option value="">Select a port...</option>
+        </select>
+        <button type="button" id="refreshPorts">Refresh</button>
+        <br><br>
+        
+        <label for="baudRate">Baud Rate:</label>
+        <input type="number" id="baudRate" name="baudRate" value="19200" required>
+        <br><br>
+        
+        <label for="dataBits">Data Bits:</label>
+        <select id="dataBits" name="dataBits" required>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8" selected>8</option>
+        </select>
+        <br><br>
+        
+        <label for="stopBits">Stop Bits:</label>
+        <select id="stopBits" name="stopBits" required>
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+        </select>
+        <br><br>
+        
+        <label for="parity">Parity:</label>
+        <select id="parity" name="parity" required>
+            <option value="none" selected>None</option>
+            <option value="even">Even</option>
+            <option value="mark">Mark</option>
+            <option value="odd">Odd</option>
+            <option value="space">Space</option>
+        </select>
+        <br><br>
+        
+        <label for="flowControl">Flow Control:</label>
+        <select id="flowControl" name="flowControl" required>
+            <option value="false" selected>No</option>
+            <option value="true">Yes</option>
+        </select>
+        <br><br>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <label for="delimiter">Delimiter:</label>
+            <input type="text" id="delimiter" name="delimiter" value="\n" style="flex: 1;">
+        </div>
+        <br><br>
+        <div style="display: flex; align-items: center;">
+            
+
+            <!-- <button type="button" id="chooseFolderButton" onclick="chooseFolder()" style="margin-right: 10px;">
+                Choose Log Folder
+            </button> -->
+            <div style="display: flex; align-items: center;">
+                <label style="margin-right: 20px;">
+                    <input type="checkbox" id="logDataCheckbox" onchange="chooseFolder()" style="margin-right: 10px;">
+                    Log Data
+                </label>
+                
+                <p style="margin: 0; margin-right: 10px;">Name:</p>
+                <input type="text" id="fileName" style="flex: 1;" disabled>
+            </div>
+        </div>
+        <br>
+    </div>
+    
+    <button type="button" id="connectButton" onclick="connectDisconnect()">Connect</button>
+</form>
+
+    <div class="container">
+        <textarea id="outputText" placeholder="" readonly></textarea>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="text" id="messageInput" placeholder="Enter message" style="flex: 1;">
+            <button id="sendButton">Send</button>
+        </div>
+
+    </div>
+    
+</body>
+
+</html>
+
+
+  <script>
+    const sendButton = document.getElementById('sendButton');
+    const messageInput = document.getElementById('messageInput');
+    const outputText = document.getElementById('outputText');
+
+    sendButton.addEventListener('click', () => {
+      const message = messageInput.value;
+      window.electronAPI.sendToSerial(message);
+    });
+
+    window.electronAPI.onSerialData((data) => {
+      // Append new data to the textarea
+      outputText.value += `${data}\n`;
+      // Scroll to the bottom of the textarea
+      outputText.scrollTop = outputText.scrollHeight;
+    });
+
+
+    async function populatePorts() {
+        const portSelect = document.getElementById('portSelect');
+        portSelect.innerHTML = '<option value="">Select a port...</option>'; // Clear existing options
+
+        try {
+            const ports = await window.electronAPI.listPorts();
+            ports.forEach(port => {
+                const option = document.createElement('option');
+                option.value = port.path;
+                option.text = port.path + " (" + port.manufacturer + ") "// + port.serialNumber + "  )";
+                portSelect.add(option);
+            });
+        } catch (error) {
+            console.error('Error populating ports:', error);
+        }
+    }
+
+    // Add event listener for the refresh button
+    document.getElementById('refreshPorts').addEventListener('click', populatePorts);
+
+    // Initial population of ports
+    populatePorts();
+
+
+
+
+    async function connectDisconnect() {
+
+
+        if( document.getElementById("connectButton").innerHTML == "Disconnect"){
+            //Disconnecting
+            const disconnectSucessful = await electronAPI.disconnectSerialPort();
+            if(disconnectSucessful){
+                const section = document.getElementById('hiddenSection');
+                section.classList.remove('locked');
+                document.getElementById("connectButton").innerHTML = "Connect";
+            }
+            return;
+        }
+
+
+        const portName = document.getElementById('portSelect').value;
+        console.log("portName: " + portName)
+        if (portName == ""){
+            alert("Please select a valid port from the dropdown.");
+        }
+
+
+        const baudRate = parseInt(document.getElementById('baudRate').value);
+        const dataBits = parseInt(document.getElementById('dataBits').value);
+        const stopBits = parseInt(document.getElementById('stopBits').value);
+        const parity = document.getElementById('parity').value;
+        const flowControl = document.getElementById('flowControl').value === 'true';
+        const delimiter = document.getElementById('delimiter').value;
+
+
+        console.log('Delimiter:', JSON.stringify(delimiter));
+
+        const connectionSucessful = await electronAPI.connectSerialPort({
+            path: portName,
+            baudRate,
+            dataBits,
+            stopBits,
+            parity,
+            flowControl,
+            delimiter: delimiter
+        });
+
+        console.log(status);
+
+        if (connectionSucessful) {
+            const section = document.getElementById('hiddenSection');
+            section.classList.add('locked');
+            document.getElementById("connectButton").innerHTML = "Disconnect"
+        }
+
+        
+    }
+
+    electronAPI.onSerialData(data => {
+        document.getElementById('outputInput').value += data + '\n';
+    });
+
+
+    async function chooseFolder(){
+        const logDataCheckbox = document.getElementById('logDataCheckbox');
+        const isLoggingEnabled = logDataCheckbox.checked;
+        if(!isLoggingEnabled){
+            window.electronAPI.chooseLogFolder("");
+            return;
+        }
+        const fileName = document.getElementById('fileName').value ;
+        await window.electronAPI.chooseLogFolder(fileName);
+    }
+
+
+    async function initFileName(){
+        console.log("initiFileName");
+
+        function getCurrentDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}--${hours}-${minutes}-${seconds}`;
+        }
+
+        // Set the value of the textbox to the current date and time
+        document.getElementById('fileName').value =  getCurrentDateTime() + ".csv";
+
+    }
+
+    initFileName();
+
+  </script>
+
