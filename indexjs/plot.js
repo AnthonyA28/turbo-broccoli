@@ -4,23 +4,11 @@ let pltIndexY = 4;
 let pltMaxItems = 500;
 
 
-
-function createPlot() {
-    const data = [{
-        x: [],
-        y: [],
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Serial Data',
-        line: { color: "#000000", width: 2 }, // Black lines for better visibility
-        marker: { color: "#000000", size: 6 } // Black markers with a moderate size
-    }];
-
-    const layout = {
-        title: 'Real-Time Serial Data',
+const layout = {
+        // title: 'Real-Time Serial Data',
         showlegend: false, // Hides legend
         font: { family: "Segoe UI", size: 14, color: "#000000" }, // Global font settings
-        // margin: { b: 80, l: 80, r: 230, t: 30 }, // Margins for better spacing
+        margin: { b: 100, l: 100, r: 30, t: 30 }, // Margins for better spacing
         width: "100%", // Fit to parent element width
         height: "100%", // Fit to parent element height
         paper_bgcolor: "#FFFFFF", // White background
@@ -52,6 +40,19 @@ function createPlot() {
             minor: { showgrid: false, ticks: "inside", ticklen: 2, tickcolor: "#000000" }
         },
     };
+
+function createPlot() {
+    const data = [{
+        x: [],
+        y: [],
+        type: 'scatter',
+        mode: 'lines+markers',
+        name: 'Serial Data',
+        line: { color: "#000000", width: 2 }, // Black lines for better visibility
+        marker: { color: "#000000", size: 6 } // Black markers with a moderate size
+    }];
+
+    
 
     Plotly.newPlot('plotlyGraph', data, layout);
 }
@@ -90,15 +91,11 @@ function replacePlotData(x, y) {
 
     // Replace all data in the graph
     Plotly.react('plotlyGraph', [{
-        x: x, // New x values
-        y: y, // New y values
-        type: 'scatter', // Type of plot
-        mode: 'lines+markers' // Display lines and markers
-    }], {
-        title: 'Updated Plot', // Optional: Update the title
-        xaxis: { title: 'X Axis' }, // Optional: Update x-axis title
-        yaxis: { title: 'Y Axis' } // Optional: Update y-axis title
-    });
+        x: x,
+        y: y,
+        type: 'scatter',
+        mode: 'lines+markers'
+    }], layout); // Use existing layout
 }
 
 

@@ -32,9 +32,24 @@ let numIndices = 10;
 
 parseData = []
 
+// Define the number of rows and columns
+const rows = 10000;
+const cols = numIndices;
+
+// Create a Float64Array with the required size (rows * cols)
+let float64Array = new Float64Array(rows * cols);
+let f64IRow = 0;
 
 
-
+// Convert it into a 2D array format for better readability
+function reshapeTo2D(flatArray, rows, cols) {
+    let result = [];
+    for (let i = 0; i < rows; i++) {
+        result.push(flatArray.slice(i * cols, (i + 1) * cols));
+    }
+    return result;
+}
+float64Array = reshapeTo2D(float64Array, rows, cols);
 
 function extractXY(parseData) {
     const x = parseData.map((item) => item[pltIndexX]); // Index 2 for item 3
@@ -66,6 +81,11 @@ window.electronAPI.onSerialData((data) => {
             return;
         }
 
+        for(let i = 0; i < numIndices; i ++ ) {
+            float64Array[f64IRow][i] = parsedData[i] 
+        }
+        f64IRow += 1; 
+        
         parseData.push(parsedData);
         if (parseData.length > pltMaxItems) {
             parseData = reduceData(parseData);

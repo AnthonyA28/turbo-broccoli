@@ -266,21 +266,37 @@ ipcMain.handle('list-ports', async () => {
 });
 
 
-app.disableHardwareAcceleration();
 
 app.commandLine.appendSwitch('disable-background-timer-throttling');
 app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-renderer-process-reuse');
+app.disableHardwareAcceleration();
 
 
 app.on('minimize', (event) => {
     event.preventDefault();
-    win.hide(); // Hide instead of minimizing
+    if (mainWindow) {
+        mainWindow.hide(); // Hide the window instead of minimizing
+    }
+});
+
+app.on('activate', () => {
+    if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+    }
+    mainWindow.show();
 });
 
 
 app.on('ready', () => {
     if (process.platform === 'win32') {
         app.setAppUserModelId('my-app-id'); // Fixes taskbar icon on Windows
+    }
+});
+
+app.on('quit', () => {
+    if (powerSaveBlocker.isStarted(blocker)) {
+        powerSaveBlocker.stop(blocker);
     }
 });
