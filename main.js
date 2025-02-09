@@ -81,7 +81,7 @@ ipcMain.handle('choose-log-folder', async (event, fileName) => {
 
 
 ipcMain.handle('connect-serial-port', async (event, config) => {
-    const { path, baudRate, dataBits, stopBits, parity, flowControl, delimiter } = config;
+    const { path, baudRate, dataBits,startBits,  stopBits, parity, flowControl, delimiter } = config;
     
     console.log("main.js delimiter: " +  JSON.stringify(delimiter) )
 
@@ -109,7 +109,10 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
       currentParser.on('data', (data) => {
         console.log(`Received data: ${data}`);
         logData(data);
+
+          
         mainWindow.webContents.send('serial-data', data);
+
       });
 
         return true;
@@ -118,6 +121,26 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
       event.reply('serial-port-status', 'error');
       return false;
     }
+
+
+    try {
+        const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
+
+        if (parsedData.length > 4) {
+            const xValue = parsedData[3];  // 3rd index
+            const yValue = parsedData[4];  // 4th index
+
+            console.log(`Extracted x: ${xValue}, y: ${yValue}`);
+
+            // Send extracted x, y to the renderer process
+            
+            mainWindow.webContents.send('serialData', { x: xValue, y: yValue });
+            
+        }
+    } catch (error) {
+        console.log("Error parsing serial data:", error);
+    }
+
 });
 
 async function logData(data){
@@ -127,6 +150,9 @@ async function logData(data){
         const toWrite = data + unEscapedDelimiter;
         fs.appendFileSync(globalFilePath, toWrite);
         console.log("Successfully  logged " + data );
+
+
+
     } catch (error) {
         console.log("Failed to log " + data );
     }

@@ -89,8 +89,11 @@ input[type="text"], input[type="number"] {
   </style>
 </head>
 
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <body>
+
+
 <form id="serialPortForm">
     <div id="hiddenSection">
         <label for="path">Path:</label>
@@ -101,7 +104,7 @@ input[type="text"], input[type="number"] {
         <br><br>
         
         <label for="baudRate">Baud Rate:</label>
-        <input type="number" id="baudRate" name="baudRate" value="19200" required>
+        <input type="number" id="baudRate" name="baudRate" value="9600" required>
         <br><br>
         
         <label for="dataBits">Data Bits:</label>
@@ -115,8 +118,15 @@ input[type="text"], input[type="number"] {
         
         <label for="stopBits">Stop Bits:</label>
         <select id="stopBits" name="stopBits" required>
-            <option value="1" selected>1</option>
-            <option value="2">2</option>
+            <option value="0" selected>1</option>
+            <option value="1">2</option>
+        </select>
+        <br><br>
+
+        <label for="startBits">Start Bits:</label>
+        <select id="startBits" name="startBits" required>
+            <option value="0" selected>1</option>
+            <option value="1">2</option>
         </select>
         <br><br>
         
@@ -164,6 +174,10 @@ input[type="text"], input[type="number"] {
 </form>
 
     <div class="container">
+        <div id="plotlyGraph" style="width: 100%; max-width: 700px; height: 400px;"></div>
+    </div>
+
+    <div class="container">
         <textarea id="outputText" placeholder="" readonly></textarea>
         <div style="display: flex; align-items: center; gap: 10px;">
             <input type="text" id="messageInput" placeholder="Enter message" style="flex: 1;">
@@ -171,147 +185,17 @@ input[type="text"], input[type="number"] {
         </div>
 
     </div>
+
+    <div class="container">
     
+    <table id="dataTable">
+        <tbody>
+            <!-- Rows will be added dynamically -->
+        </tbody>
+    </table>
+</div>
+
 </body>
 
 </html>
-
-
-  <script>
-    const sendButton = document.getElementById('sendButton');
-    const messageInput = document.getElementById('messageInput');
-    const outputText = document.getElementById('outputText');
-
-    sendButton.addEventListener('click', () => {
-      const message = messageInput.value;
-      window.electronAPI.sendToSerial(message);
-    });
-
-    window.electronAPI.onSerialData((data) => {
-      // Append new data to the textarea
-      outputText.value += `${data}\n`;
-      // Scroll to the bottom of the textarea
-      outputText.scrollTop = outputText.scrollHeight;
-    });
-
-
-    async function populatePorts() {
-        const portSelect = document.getElementById('portSelect');
-        portSelect.innerHTML = '<option value="">Select a port...</option>'; // Clear existing options
-
-        try {
-            const ports = await window.electronAPI.listPorts();
-            ports.forEach(port => {
-                const option = document.createElement('option');
-                option.value = port.path;
-                option.text = port.path + " (" + port.manufacturer + ") "// + port.serialNumber + "  )";
-                portSelect.add(option);
-            });
-        } catch (error) {
-            console.error('Error populating ports:', error);
-        }
-    }
-
-    // Add event listener for the refresh button
-    document.getElementById('refreshPorts').addEventListener('click', populatePorts);
-
-    // Initial population of ports
-    populatePorts();
-
-
-
-
-    async function connectDisconnect() {
-
-
-        if( document.getElementById("connectButton").innerHTML == "Disconnect"){
-            //Disconnecting
-            const disconnectSucessful = await electronAPI.disconnectSerialPort();
-            if(disconnectSucessful){
-                const section = document.getElementById('hiddenSection');
-                section.classList.remove('locked');
-                document.getElementById("connectButton").innerHTML = "Connect";
-            }
-            return;
-        }
-
-
-        const portName = document.getElementById('portSelect').value;
-        console.log("portName: " + portName)
-        if (portName == ""){
-            alert("Please select a valid port from the dropdown.");
-        }
-
-
-        const baudRate = parseInt(document.getElementById('baudRate').value);
-        const dataBits = parseInt(document.getElementById('dataBits').value);
-        const stopBits = parseInt(document.getElementById('stopBits').value);
-        const parity = document.getElementById('parity').value;
-        const flowControl = document.getElementById('flowControl').value === 'true';
-        const delimiter = document.getElementById('delimiter').value;
-
-
-        console.log('Delimiter:', JSON.stringify(delimiter));
-
-        const connectionSucessful = await electronAPI.connectSerialPort({
-            path: portName,
-            baudRate,
-            dataBits,
-            stopBits,
-            parity,
-            flowControl,
-            delimiter: delimiter
-        });
-
-        console.log(status);
-
-        if (connectionSucessful) {
-            const section = document.getElementById('hiddenSection');
-            section.classList.add('locked');
-            document.getElementById("connectButton").innerHTML = "Disconnect"
-        }
-
-        
-    }
-
-    electronAPI.onSerialData(data => {
-        document.getElementById('outputInput').value += data + '\n';
-    });
-
-
-    async function chooseFolder(){
-        const logDataCheckbox = document.getElementById('logDataCheckbox');
-        const isLoggingEnabled = logDataCheckbox.checked;
-        if(!isLoggingEnabled){
-            window.electronAPI.chooseLogFolder("");
-            return;
-        }
-        const fileName = document.getElementById('fileName').value ;
-        await window.electronAPI.chooseLogFolder(fileName);
-    }
-
-
-    async function initFileName(){
-        console.log("initiFileName");
-
-        function getCurrentDateTime() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            return `${year}-${month}-${day}--${hours}-${minutes}-${seconds}`;
-        }
-
-        // Set the value of the textbox to the current date and time
-        document.getElementById('fileName').value =  getCurrentDateTime() + ".csv";
-
-    }
-
-    initFileName();
-
-  </script>
 
