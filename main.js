@@ -186,6 +186,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: path.join(__dirname, 'assets', 'icon.ico'), 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -275,4 +276,11 @@ app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.on('minimize', (event) => {
     event.preventDefault();
     win.hide(); // Hide instead of minimizing
+});
+
+
+app.on('ready', () => {
+    if (process.platform === 'win32') {
+        app.setAppUserModelId('my-app-id'); // Fixes taskbar icon on Windows
+    }
 });

@@ -1,8 +1,11 @@
 {
-  "name": "my-serialport-electron-project",
+  "name": "ElectroLink",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
+    "build": {
+    "icon": "assets/icon"
+  },
   "scripts": {
     "start": "electron ."
   },

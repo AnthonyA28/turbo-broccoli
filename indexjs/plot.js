@@ -11,14 +11,46 @@ function createPlot() {
         y: [],
         type: 'scatter',
         mode: 'lines+markers',
-        name: 'Serial Data'
+        name: 'Serial Data',
+        line: { color: "#000000", width: 2 }, // Black lines for better visibility
+        marker: { color: "#000000", size: 6 } // Black markers with a moderate size
     }];
 
     const layout = {
         title: 'Real-Time Serial Data',
-        xaxis: { title: 'X Value' },
-        yaxis: { title: 'Y Value' },
+        showlegend: false, // Hides legend
+        font: { family: "Segoe UI", size: 14, color: "#000000" }, // Global font settings
+        // margin: { b: 80, l: 80, r: 230, t: 30 }, // Margins for better spacing
+        width: "100%", // Fit to parent element width
+        height: "100%", // Fit to parent element height
+        paper_bgcolor: "#FFFFFF", // White background
+        plot_bgcolor: "#FFFFFF", // White plot area
         autosize: true, // Enable automatic resizing
+        xaxis: {
+            title: { text: "X", font: { color: "#000000" }, standoff: 0 },
+            type: "linear",
+            mirror: "ticks",
+            zeroline: false, // Removes zero line
+            ticks: "inside",
+            ticklen: 5,
+            tickcolor: "#000000",
+            linecolor: "#000000",
+            showgrid: false, // No grid lines
+            minor: { showgrid: false, ticks: "inside", ticklen: 2, tickcolor: "#000000" }
+        },
+        yaxis: {
+            title: { text: "Y", font: { color: "#000000" }, standoff: 0 },
+            range: [null, null], // Auto-scale
+            type: "linear",
+            mirror: "ticks",
+            zeroline: false,
+            ticks: "inside",
+            ticklen: 5,
+            tickcolor: "#000000",
+            linecolor: "#000000",
+            showgrid: false,
+            minor: { showgrid: false, ticks: "inside", ticklen: 2, tickcolor: "#000000" }
+        },
     };
 
     Plotly.newPlot('plotlyGraph', data, layout);
