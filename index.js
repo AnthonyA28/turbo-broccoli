@@ -1,159 +1,41 @@
-const { SerialPort } = require('serialport');
-const { ReadlineParser } = require('@serialport/parser-readline');
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("✅ DOM fully loaded.");
 
-const portName = 'COM10'; // Replace with your port name
+    function toggleContainer(containerId) {
+        if (containerId === "toggle-all") {
+            // ✅ Toggle all containers
+            document.querySelectorAll(".container").forEach(container => {
+                container.classList.toggle("hidden");
+            });
+        } else {
+            // ✅ Toggle a specific container
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.classList.toggle("hidden");
+            } else {
+                console.warn(`Container with id "${containerId}" not found.`);
+            }
+        }
+    }
 
-const port = new SerialPort({
-  path: portName,
-  baudRate: 9600,
+    // ✅ Listen for "toggle-container" events from the main process
+    window.electronAPI.receive('toggle-container', (containerId) => {
+        console.log(`Toggling ${containerId}`);
+        toggleContainer(containerId);
+    });
 });
 
-const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-
-parser.on('data', (data) => {
-  console.log(`Received data: ${data}`);
-});
-
-port.on('open', () => {
-  console.log('Serial port opened');
-});
-
-port.on('error', (err) => {
-  console.error('Error: ', err.message);
-});
 
 
 
-
-
-let pltIndexX = 3; 
-let pltIndexY = 4;
-let pltMaxItems = 1000;
+let numIndices = 10;
 
 parseData = []
 
 
 
-// Function to render the table dynamically
-function renderTable(data) {
-    const table = document.getElementById("dynamicTable");
-    const thead = table.querySelector("thead");
-    const tbody = table.querySelector("tbody");
-
-    // Clear existing content
-    thead.innerHTML = "";
-    tbody.innerHTML = "";
-
-    // Create table headers (if data has rows)
-    if (data.length > 0) {
-        const headerRow = document.createElement("tr");
-        // Use the first row to determine the number of columns
-        for (let i = 0; i < data[0].length; i++) {
-            const th = document.createElement("th");
-            th.textContent = `Column ${i + 1}`; // Generic column names (e.g., Column 1, Column 2)
-            headerRow.appendChild(th);
-        }
-        thead.appendChild(headerRow);
-    }
-
-    // Create table rows
-    data.forEach((row) => {
-        const tr = document.createElement("tr");
-        row.forEach((cell) => {
-            const td = document.createElement("td");
-            td.textContent = cell; // Add cell data
-            tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-    });
-}
 
 
-function createPlot() {
-    const data = [{
-        x: [],
-        y: [],
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Serial Data'
-    }];
-
-    const layout = {
-        title: 'Real-Time Serial Data',
-        xaxis: { title: 'X Value' },
-        yaxis: { title: 'Y Value' }
-    };
-
-    Plotly.newPlot('plotlyGraph', data, layout);
-}
-
-// Run this function once at the beginning
-createPlot()
-
-function updatePlot(x, y) {
-    const graphDiv = document.getElementById('plotlyGraph');
-
-    // Ensure the Plotly graph exists
-    if (!graphDiv || !graphDiv.data || graphDiv.data.length === 0) {
-        console.error("Plotly graph not initialized.");
-        return;
-    }
-
-    // Extend the trace with new (x, y) values
-    Plotly.extendTraces('plotlyGraph', { x: [[x]], y: [[y]] }, [0]);
-
-}
-
-function replacePlotData(x, y) {
-    const graphDiv = document.getElementById('plotlyGraph');
-
-    // Ensure the Plotly graph exists
-    if (!graphDiv) {
-        console.error("Plotly graph container not found.");
-        return;
-    }
-
-    // Ensure x and y are arrays and have the same length
-    if (!Array.isArray(x) || !Array.isArray(y) || x.length !== y.length) {
-        console.error("Invalid input: x and y must be arrays of the same length.");
-        return;
-    }
-
-    // Replace all data in the graph
-    Plotly.react('plotlyGraph', [{
-        x: x, // New x values
-        y: y, // New y values
-        type: 'scatter', // Type of plot
-        mode: 'lines+markers' // Display lines and markers
-    }], {
-        title: 'Updated Plot', // Optional: Update the title
-        xaxis: { title: 'X Axis' }, // Optional: Update x-axis title
-        yaxis: { title: 'Y Axis' } // Optional: Update y-axis title
-    });
-}
-
-
-    const sendButton = document.getElementById('sendButton');
-    const messageInput = document.getElementById('messageInput');
-    const outputText = document.getElementById('outputText');
-
-    sendButton.addEventListener('click', () => {
-      const message = messageInput.value;
-      window.electronAPI.sendToSerial(message);
-    });
-
-        // Add event listener for the Enter key on the message input
-    messageInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent the default form submission behavior
-            sendButton.click(); // Simulate a click on the Send button
-        }
-    });
-
-
-function reduceData(parseData) {
-    return parseData.filter((item, index) => index % 2 === 0); 
-}
 function extractXY(parseData) {
     const x = parseData.map((item) => item[pltIndexX]); // Index 2 for item 3
     const y = parseData.map((item) => item[pltIndexY]); // Index 3 for item 4
@@ -179,6 +61,10 @@ window.electronAPI.onSerialData((data) => {
     try {
         // Remove brackets and split by ";"
         const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
+        console.log(parsedData.length)
+        if (parsedData.length != numIndices) {
+            return;
+        }
 
         parseData.push(parsedData);
         if (parseData.length > pltMaxItems) {

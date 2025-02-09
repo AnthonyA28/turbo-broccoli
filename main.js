@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, dialog, ipcMain, powerSaveBlocker } = require('electron');
 const path = require('path');
 const { SerialPort } = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
@@ -11,6 +11,16 @@ let globalFilePath = '';
 let currentPort = null;
 let currentParser = null;
 let unEscapedDelimiter = "\n";
+
+
+const blocker = powerSaveBlocker.start('prevent-app-suspension');
+
+
+
+
+
+
+
 
 // Handle disconnecting from the serial port
 ipcMain.handle('disconnect-serial-port', async () => {
@@ -185,6 +195,38 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
+
+
+    const customMenu = Menu.buildFromTemplate([
+        {
+            label: "Containers",
+            submenu: [
+                { label: "toggle container 1", click: () => mainWindow.webContents.send('toggle-container', 'container1') },
+                { label: "toggle container 2", click: () => mainWindow.webContents.send('toggle-container', 'container2') },
+                { label: "toggle container 3", click: () => mainWindow.webContents.send('toggle-container', 'container3') },
+                { label: "toggle container 4", click: () => mainWindow.webContents.send('toggle-container', 'container4') },
+                { type: 'separator' },
+                { label: "Toggle All Containers", click: () => mainWindow.webContents.send('toggle-container', 'toggle-all') },
+            ]
+        },
+        {
+            label: "View",
+            submenu: [
+                { role: "reload" },
+                { role: "togglefullscreen" },
+                { type: 'separator' },
+                { 
+                    label: "Toggle Developer Tools", 
+                    accelerator: "Ctrl+Shift+I", // Shortcut to open DevTools
+                    click: () => mainWindow.webContents.toggleDevTools()
+                }
+            ]
+        }
+    ]);
+
+    Menu.setApplicationMenu(customMenu);
+
+
     // Send an initialize message after the window is ready
     mainWindow.webContents.on('did-finish-load', () => {
       console.log("Finished loading");
@@ -223,3 +265,14 @@ ipcMain.handle('list-ports', async () => {
 });
 
 
+app.disableHardwareAcceleration();
+
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+
+
+app.on('minimize', (event) => {
+    event.preventDefault();
+    win.hide(); // Hide instead of minimizing
+});
