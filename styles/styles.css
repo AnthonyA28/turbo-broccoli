@@ -1,0 +1,90 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    width: 95vw;
+    height: 95vh; /* Full viewport height */
+    display: flex;
+    background-color: #222831;
+    color: #ddd;
+}
+
+/* Flexbox Layout for Horizontal Columns */
+#flex-container {
+    display: flex; /* Horizontal layout */
+    flex-direction: row; /* Ensures side-by-side orientation */
+    width: 95vw; /* Full width */
+    height: 95vh; /* Full height */
+}
+
+/* Individual Containers */
+.container {
+    flex: 1; /* Distribute space equally */
+    display: flex;
+    flex-direction: column; /* Stack elements inside */
+    justify-content: flex-start;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 95vh; /* Ensures full height */
+    min-width: 500px; /* Prevents shrinking too much */
+    overflow: hidden; /* Prevents unwanted growth */
+}
+
+/* Hidden State */
+.container.hidden {
+    min-width: 0 !important; /* Collapse container */
+    width: 0 !important;
+    flex: 0 !important;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    overflow: hidden;
+    pointer-events: none; /* Prevents interaction */
+}
+
+/* Resizable Handles */
+.resizer {
+    width: 5px; /* Thin vertical resizer */
+    background: #aaa;
+    cursor: col-resize;
+    z-index: 10;
+    height: 95vh; /* Ensures full height */
+}
+
+/* Table Container - Fixed Height with Scrolling */
+.table-container {
+    flex-grow: 1; /* Allow it to take available space */
+    width: 95%;
+    height: 95%;
+    overflow-y: auto; /* Enables scrolling */
+    border: 1px solid #ddd;
+}
+
+/* Table Styling */
+table {
+    width: 95%;
+    height: 95%;
+    border-collapse: collapse; /* Ensures borders don't double */
+    font-family: Arial, sans-serif;
+    border: 2px solid white; /* Outer table border in white */
+}
+
+/* Table Headers & Cells */
+th, td {
+    border: 2px solid white; /* White grid lines between rows & columns */
+    padding: 12px;
+    text-align: left;
+    color: #E0E0E0; /* Light text for contrast */
+}
+
+/* Header Styling */
+th {
+    background-color: #4CAF50;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+

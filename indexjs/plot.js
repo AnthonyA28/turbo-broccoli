@@ -17,7 +17,8 @@ function createPlot() {
     const layout = {
         title: 'Real-Time Serial Data',
         xaxis: { title: 'X Value' },
-        yaxis: { title: 'Y Value' }
+        yaxis: { title: 'Y Value' },
+        autosize: true, // Enable automatic resizing
     };
 
     Plotly.newPlot('plotlyGraph', data, layout);
@@ -90,3 +91,10 @@ function replacePlotData(x, y) {
 function reduceData(parseData) {
     return parseData.filter((item, index) => index % 2 === 0); 
 }
+
+window.addEventListener('resize', () => {
+    Plotly.relayout('plotlyGraph', {
+        width: document.getElementById('plotlyGraph').clientWidth,
+        height: document.getElementById('plotlyGraph').clientHeight
+    });
+});
