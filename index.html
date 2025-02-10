@@ -4,8 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grovelink</title>
+
 <link rel="stylesheet" href="styles/styles.css">
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<link rel="stylesheet" href="styles/datatable-min.2.2.2.css">
+
+<script src="includes/plotly.jsv1.58.5.js"></script>
+<script src="includes/jquery-3.7.1.js"></script>
+<script src="includes/datatable-min.2.2.2.js"></script>
 
 </head>
 
@@ -109,24 +114,34 @@
 
     <div class="container" id="container4">
     
-    <div class="table-container">
-        <table id="dynamicTable">
+    <div class="table-container" id="table-container" style="max-height: 900px; overflow-y: auto;">
+        <table id="myTable" class="display">
             <thead>
-                <!-- Column headers will be added dynamically -->
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th>Value</th>
+                </tr>
             </thead>
-            <tbody>
-                <!-- Rows will be added dynamically -->
-            </tbody>
+            <tbody></tbody>
         </table>
     </div>
 </div>
 
 </body>
 
-<script src="index.js"></script>
 <script src="indexjs/array.js"></script>
-<script src="indexjs/table.js"></script>
+<script src="index.js"></script>
 <script src="indexjs/plot.js"></script>
+<script src="indexjs/UI.js"></script>
+<script src="indexjs/table.js"></script>
 <script>
     
 

@@ -1,4 +1,44 @@
+
+
 document.addEventListener("DOMContentLoaded", () => {
+
+
+
+
+
+    console.log("✅ DOM fully loaded.");
+
+
+
+    
+
+    function toggleContainer(containerId) {
+        if (containerId === "toggle-all") {
+            // ✅ Toggle all containers
+            document.querySelectorAll(".container").forEach(container => {
+                container.classList.toggle("hidden");
+            });
+        } else {
+            // ✅ Toggle a specific container
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.classList.toggle("hidden");
+            } else {
+                console.warn(`Container with id "${containerId}" not found.`);
+            }
+        }
+    }
+
+    // ✅ Listen for "toggle-container" events from the main process
+    window.electronAPI.receive('toggle-container', (containerId) => {
+        console.log(`Toggling ${containerId}`);
+        toggleContainer(containerId);
+    });
+
+
+
+
+    
     const resizers = document.querySelectorAll(".resizer");
     let isDragging = false;
     let startX, startWidth, prevColumn, nextColumn;

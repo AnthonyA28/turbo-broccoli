@@ -1,10 +1,9 @@
 
 let pltIndexX = 3; 
 let pltIndexY = 4;
-let pltMaxItems = 500;
-
-// let xData = new Array(10).fill(NaN);
-// let yData = new Array(10).fill(NaN);
+const maxPlotPoints = 10000;
+const xData = [];
+const yData = [];
 let dataIndex = 0; 
 
 
@@ -49,7 +48,7 @@ function createPlot() {
     const data = [{
         x: [],
         y: [],
-        type: 'scatter',
+        type: 'scattergl',
         mode: 'lines+markers',
         name: 'Serial Data',
         line: { color: "#000000", width: 2 }, // Black lines for better visibility
@@ -79,6 +78,13 @@ function updatePlot(x, y) {
 }
 
 function replacePlotData(x, y) {
+
+    if (!x || !y || x.length === 0 || y.length === 0) {
+        console.error("Invalid data: x and y must be non-empty arrays.");
+        return;
+    }
+
+
     const graphDiv = document.getElementById('plotlyGraph');
 
     // Ensure the Plotly graph exists
@@ -88,12 +94,15 @@ function replacePlotData(x, y) {
     }
 
 
+
     // Replace all data in the graph
     Plotly.react('plotlyGraph', [{
         x: x,
         y: y,
-        type: 'scatter',
-        mode: 'lines+markers'
+        type: 'scattergl',
+        mode: 'lines+markers',
+        line: { color: "#000000", width: 2 }, // Black lines for better visibility
+        marker: { color: "#000000", size: 6 } // Black markers with a moderate size
     }], layout); // Use existing layout
     }
 
@@ -129,26 +138,65 @@ window.addEventListener('resize', () => {
 
 
 
+function movingAverageDownsample(arr, n) {
+    if (arr.length <= n) return Array.from(arr); // No need to downsample
+
+    const step = Math.floor(arr.length / n); // Compute step size
+    const result = [];
+
+    for (let i = 0; i < n; i++) {
+        const start = i * step;
+        const end = Math.min(start + step, arr.length);
+
+        // Compute the average over this range
+        const avg = arr.slice(start, end).reduce((sum, val) => sum + val, 0) / (end - start);
+        result.push(avg);
+    }
+
+    return result;
+}
+
 function plotTimer() {
 
-    // while( dataIndex <  f64rows){
-    //     let valueX = float64Array[dataIndex * f64cols + pltIndexX];
-    //     let valueY = float64Array[dataIndex * f64cols + pltIndexY];
-    //     if(isNaN(valueX) || isNaN(valueY)) {
-    //         break;
-    //     }
-    //     xData[dataIndex] = valueX;
-    //     yData[dataIndex] = valueY;
-    //     dataIndex = dataIndex + 1; 
-    // }
-    let xData = getColumnUpToRow(float64Array, pltIndexX, f64rows, f64cols);
-    let yData = getColumnUpToRow(float64Array, pltIndexY, f64rows, f64cols);
+    let  moreX = []
+    let  moreY = []
+    while( dataIndex <  f64rows){
+        let valueX = float64Array[dataIndex * f64cols + pltIndexX];
+        let valueY = float64Array[dataIndex * f64cols + pltIndexY];
+        if(isNaN(valueX) || isNaN(valueY)) {
+            // dataIndex = dataIndex - 1; 
+            break;
+        }
+        // xData[dataIndex] = valueX;
+        // yData[dataIndex] = valueY;
+        moreX.push(valueX);
+        moreY.push(valueY);
+        dataIndex = dataIndex + 1; 
+    }
+    // let xData = getColumnUpToRow(float64Array, pltIndexX, f64rows, f64cols);
+    // let yData = getColumnUpToRow(float64Array, pltIndexY, f64rows, f64cols);
 
 
-    replacePlotData(xData, yData);
+    // replacePlotData(xData, yData);
+    const graphDiv = document.getElementById('plotlyGraph');
 
-    console.log("Function executed at", new Date().toLocaleTimeString());
+    if(graphDiv.data[0].x.length > maxPlotPoints){
+        let xData = Array.from(getColumnUpToRow(float64Array, pltIndexX, dataIndex-1, f64cols));
+        let yData = Array.from(getColumnUpToRow(float64Array, pltIndexY, dataIndex-1, f64cols));
+        xData = movingAverageDownsample(xData, maxPlotPoints/2);
+        yData = movingAverageDownsample(yData, maxPlotPoints/2);
+
+
+        replacePlotData(xData, yData)
+    }
+
+
+    Plotly.extendTraces(graphDiv, {
+        x: [moreX], 
+        y: [moreY]
+    }, [0]);
+
 }
 
 // Run `plotTimer` every 5 seconds
-const intervalId = setInterval(plotTimer, 1000);
+const intervalId = setInterval(plotTimer, 300);

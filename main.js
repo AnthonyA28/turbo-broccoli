@@ -188,10 +188,13 @@ function createWindow() {
     height: 600,
     icon: path.join(__dirname, 'assets', 'icon.ico'), 
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      enableRemoteModule: false,
-      nodeIntegration: false
+    preload: path.join(__dirname, 'preload.js'),
+    contextIsolation: true,
+    enableRemoteModule: false,
+    nodeIntegration: false,
+    sandbox: false, // Disable sandbox if needed
+    enableBlinkFeatures: "WebGL2" // Force WebGL2 if supported
+
     }
   });
 
@@ -271,7 +274,7 @@ app.commandLine.appendSwitch('disable-background-timer-throttling');
 app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.commandLine.appendSwitch('disable-renderer-process-reuse');
-app.disableHardwareAcceleration();
+// app.disableHardwareAcceleration();
 
 
 app.on('minimize', (event) => {
@@ -300,3 +303,8 @@ app.on('quit', () => {
         powerSaveBlocker.stop(blocker);
     }
 });
+
+
+app.commandLine.appendSwitch('ignore-gpu-blacklist'); // Force GPU use
+app.commandLine.appendSwitch('enable-webgl'); // Enable WebGL explicitly
+app.commandLine.appendSwitch('disable-software-rasterizer'); // Force GPU rendering
