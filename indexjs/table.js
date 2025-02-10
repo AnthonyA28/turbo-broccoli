@@ -2,6 +2,9 @@
 let isUserScrolling = false;
 
 function renderTable(data) {
+    if (!addData){
+        return;
+    }
     const table = document.getElementById("dynamicTable");
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");

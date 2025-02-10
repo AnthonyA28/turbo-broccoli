@@ -3,6 +3,10 @@ let pltIndexX = 3;
 let pltIndexY = 4;
 let pltMaxItems = 500;
 
+// let xData = new Array(10).fill(NaN);
+// let yData = new Array(10).fill(NaN);
+let dataIndex = 0; 
+
 
 const layout = {
         // title: 'Real-Time Serial Data',
@@ -83,11 +87,6 @@ function replacePlotData(x, y) {
         return;
     }
 
-    // Ensure x and y are arrays and have the same length
-    if (!Array.isArray(x) || !Array.isArray(y) || x.length !== y.length) {
-        console.error("Invalid input: x and y must be arrays of the same length.");
-        return;
-    }
 
     // Replace all data in the graph
     Plotly.react('plotlyGraph', [{
@@ -96,7 +95,7 @@ function replacePlotData(x, y) {
         type: 'scatter',
         mode: 'lines+markers'
     }], layout); // Use existing layout
-}
+    }
 
 
     const sendButton = document.getElementById('sendButton');
@@ -127,3 +126,29 @@ window.addEventListener('resize', () => {
         height: document.getElementById('plotlyGraph').clientHeight
     });
 });
+
+
+
+function plotTimer() {
+
+    // while( dataIndex <  f64rows){
+    //     let valueX = float64Array[dataIndex * f64cols + pltIndexX];
+    //     let valueY = float64Array[dataIndex * f64cols + pltIndexY];
+    //     if(isNaN(valueX) || isNaN(valueY)) {
+    //         break;
+    //     }
+    //     xData[dataIndex] = valueX;
+    //     yData[dataIndex] = valueY;
+    //     dataIndex = dataIndex + 1; 
+    // }
+    let xData = getColumnUpToRow(float64Array, pltIndexX, f64rows, f64cols);
+    let yData = getColumnUpToRow(float64Array, pltIndexY, f64rows, f64cols);
+
+
+    replacePlotData(xData, yData);
+
+    console.log("Function executed at", new Date().toLocaleTimeString());
+}
+
+// Run `plotTimer` every 5 seconds
+const intervalId = setInterval(plotTimer, 1000);

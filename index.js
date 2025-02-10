@@ -1,3 +1,12 @@
+var f64rows = 1000;
+let numIndices = 10;
+var f64cols = numIndices;
+var float64Array = new Float64Array(f64rows * f64cols).fill(NaN);
+
+let f64IRow = 0;
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log("✅ DOM fully loaded.");
 
@@ -28,37 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-let numIndices = 10;
+
 
 parseData = []
 
 // Define the number of rows and columns
-const rows = 10000;
-const cols = numIndices;
-
-// Create a Float64Array with the required size (rows * cols)
-let float64Array = new Float64Array(rows * cols);
-let f64IRow = 0;
 
 
-// Convert it into a 2D array format for better readability
-function reshapeTo2D(flatArray, rows, cols) {
-    let result = [];
-    for (let i = 0; i < rows; i++) {
-        result.push(flatArray.slice(i * cols, (i + 1) * cols));
-    }
-    return result;
-}
-float64Array = reshapeTo2D(float64Array, rows, cols);
-
-function extractXY(parseData) {
-    const x = parseData.map((item) => item[pltIndexX]); // Index 2 for item 3
-    const y = parseData.map((item) => item[pltIndexY]); // Index 3 for item 4
-
-    return { x, y };
-}
+// Create a Float64Array (1GB of memory if rows * cols = 10M elements)
 
 
+// Helper function for 2D access
+
+
+let addData = false
 window.electronAPI.onSerialData((data) => {
     const outputText = document.getElementById('outputText');
 
@@ -69,8 +61,10 @@ window.electronAPI.onSerialData((data) => {
     }
 
     // Append raw data to the text area
-    outputText.value += `${data}\n`;
-    outputText.scrollTop = outputText.scrollHeight;
+    if(addData){
+        outputText.value += `${data}\n`;
+        outputText.scrollTop = outputText.scrollHeight;
+    }
 
     // Parse the incoming data string
     try {
@@ -82,32 +76,35 @@ window.electronAPI.onSerialData((data) => {
         }
 
         for(let i = 0; i < numIndices; i ++ ) {
-            float64Array[f64IRow][i] = parsedData[i] 
+            setValue(float64Array, f64IRow, i, f64cols, parsedData[i]); // Set value at row 2, column 3
         }
         f64IRow += 1; 
+        if(f64IRow>=float64Array.length){
+            f64IRow = 0;
+        }
         
         parseData.push(parsedData);
-        if (parseData.length > pltMaxItems) {
-            parseData = reduceData(parseData);
-            const { x, y } = extractXY(parseData);
-            replacePlotData(x,y);
-        }
+        // if (parseData.length > pltMaxItems) {
+            // parseData = reduceData(parseData);
+            // const { x, y } = extractXY(parseData);
+            // replacePlotData(x,y);
+        // }
 
 
-        if (parsedData.length > pltIndexX) {
-            const xValue = parsedData[pltIndexX];  // 3rd index
-            const yValue = parsedData[pltIndexY];  // 4th index
+        // if (parsedData.length > pltIndexX) {
+            // const xValue = parsedData[pltIndexX];  // 3rd index
+            // const yValue = parsedData[pltIndexY];  // 4th index
 
-            console.log(`Parsed X: ${xValue}, Y: ${yValue}`);
+            // console.log(`Parsed X: ${xValue}, Y: ${yValue}`);
 
             // Update the Plotly graph
-            updatePlot(xValue, yValue);
+            // updatePlot(xValue, yValue);
 
-            renderTable(parseData)
+            // renderTable(parseData)
 
-        } else {
-            console.warn("Invalid data format received:", data);
-        }
+        // } else {
+        //     console.warn("Invalid data format received:", data);
+        // }
     } catch (error) {
         console.error("Error parsing serial data:", error);
     }
@@ -232,3 +229,34 @@ window.electronAPI.onSerialData((data) => {
     }
 
     initFileName();
+
+
+
+
+function getValue(array, row, col, cols) {
+    return array[row * cols + col];
+}
+
+function setValue(array, row, col, cols, value) {
+    array[row * cols + col] = value;
+}
+
+
+function extractXY(parseData) {
+    const x = parseData.map((item) => item[pltIndexX]); // Index 2 for item 3
+    const y = parseData.map((item) => item[pltIndexY]); // Index 3 for item 4
+
+    return { x, y };
+}
+
+function getColumnUpToRow(array, colIndex, maxRow, numCols) {
+    let result = [];
+    
+    for (let row = 0; row < maxRow; row++) {
+        let value = array[row * numCols + colIndex];
+        if (isNaN(value)) break; // Stop when NaN is encountered
+        result.push(value);
+    }
+    
+    return new Float64Array(result); // Convert back to Float64Array
+}
