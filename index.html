@@ -20,7 +20,7 @@
 
 <body>
 
-<div class="container" id="container_port">
+<div class="container" id="container_port" style="max-width: 250px;">
     <form id="serialPortForm">
         <div id="hiddenSection">
             <label for="path">Path:</label>
@@ -73,10 +73,11 @@
                 <option value="true">Yes</option>
             </select>
             <br><br>
-            <div style="display: flex; align-items: center; gap: 10px;">
+            <!-- <div style="display: flex; align-items: center; gap: 10px;"> -->
+                <!-- <br> -->
                 <label for="delimiter">Delimiter:</label>
                 <input type="text" id="delimiter" name="delimiter" value="\n" style="flex: 1;">
-            </div>
+            <!-- </div> -->
             <br><br>
             <div style="display: flex; align-items: center;">
                 
@@ -84,15 +85,15 @@
                 <!-- <button type="button" id="chooseFolderButton" onclick="chooseFolder()" style="margin-right: 10px;">
                     Choose Log Folder
                 </button> -->
-                <div style="display: flex; align-items: center;">
+                <!-- <div style="display: flex; align-items: center;"> -->
                     <label style="margin-right: 20px;">
                         <input type="checkbox" id="logDataCheckbox" onchange="chooseFolder()" style="margin-right: 10px;">
                         Log Data
                     </label>
-                    
-                    <p style="margin: 0; margin-right: 10px;">Name:</p>
+                    <br>
+                    <!-- <p style="margin: 0; margin-right: 10px;">Name:</p> -->
                     <input type="text" id="fileName" style="flex: 1;" disabled>
-                </div>
+                <!-- </div> -->
             </div>
             <br>
         </div>
@@ -100,21 +101,26 @@
         <button type="button" id="connectButton" onclick="connectDisconnect()">Connect</button>
     </form>
 </div>
-    <div class="container" id="container_commands">
+    <div class="container" id="container_commands" style="max-width: 250px;">
         <label for="commandInput">Command:</label>
         <input type="text" id="commandInput" placeholder="Command">
-        <button id="addCommandBtn">Add Command</button>
-        <ul id="stringList">
-        </ul>
+        
+        <div style="display: flex; gap: 10px;">
+            <button id="addCommandBtn">Add Command</button>
+            <button id="submitCommandBtn">Submit Command</button>
+        </div>
+
+        <ol id="stringList">
+        </ol>
     </div>
 
     <div class="container" id="container_graph"
->        <div id="plotlyGraph" style="width: 100%; height: 50%"></div>
+>        <div id="plotlyGraph" style="width: 100%; height: 100%"></div>
     </div>
 
-    <div class="container"  id="container3">
+    <div class="container"  id="container3" style="display: none;">
         <textarea id="outputText" placeholder="" readonly></textarea>
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 0px;">
             <input type="text" id="messageInput" placeholder="Enter message" style="flex: 1;">
             <button id="sendButton">Send</button>
         </div>

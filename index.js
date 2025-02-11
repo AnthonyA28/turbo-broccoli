@@ -11,19 +11,19 @@ parseData = []
 
 let addData = false
 window.electronAPI.onSerialData((data) => {
-    const outputText = document.getElementById('outputText');
+    // const outputText = document.getElementById('outputText');
 
-    // Ensure the text area exists before modifying it
-    if (!outputText) {
-        console.error("Element with ID 'outputText' not found.");
-        return;
-    }
+    // // Ensure the text area exists before modifying it
+    // if (!outputText) {
+    //     console.error("Element with ID 'outputText' not found.");
+    //     return;
+    // }
 
-    // Append raw data to the text area
-    if(addData){
-        outputText.value += `${data}\n`;
-        outputText.scrollTop = outputText.scrollHeight;
-    }
+    // // Append raw data to the text area
+    // if(addData){
+    //     outputText.value += `${data}\n`;
+    //     outputText.scrollTop = outputText.scrollHeight;
+    // }
 
     // Parse the incoming data string
     try {

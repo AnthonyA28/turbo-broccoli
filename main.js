@@ -211,6 +211,22 @@ function createWindow() {
                 { label: "toggle graph", click: () => mainWindow.webContents.send('toggle-container', 'container_graph') },
                 { label: "toggle container 3", click: () => mainWindow.webContents.send('toggle-container', 'container3') },
                 { label: "toggle table", click: () => mainWindow.webContents.send('toggle-container', 'container_table') },
+                { type: "separator" }, // Optional: adds a line separator
+                {
+                    label: "Zoom In",
+                    accelerator: "Ctrl+Plus", // Standard shortcut for zooming in
+                    click: () => mainWindow.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel() + 1)
+                },
+                {
+                    label: "Zoom Out",
+                    accelerator: "Ctrl+-", // Standard shortcut for zooming out
+                    click: () => mainWindow.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel() - 1)
+                },
+                {
+                    label: "Reset Zoom",
+                    accelerator: "Ctrl+0", // Reset zoom to default
+                    click: () => mainWindow.webContents.setZoomLevel(0)
+                },
                 { type: 'separator' },
                 { 
                     label: "Toggle Developer Tools", 

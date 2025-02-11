@@ -96,7 +96,7 @@ li:nth-child(odd) {
 }
 
 li:nth-child(even) {
-    background-color: #424242; /* Light green for even items */
+    background-color: #9e9e9e; /* Light green for even items */
 }
 
 
@@ -109,13 +109,18 @@ li.dragging {
 }
 
 
+#stringList {
+    list-style-type: decimal; /* ✅ Enables numbering */
+    padding-left: 30px; /* ✅ Ensures numbers are visible */
+}
+
 #stringList li {
-    display: inline-block; /* Makes the list items respect width */
+    display: flex; /* ✅ Keeps items in a row */
     width: 20ch; /* ✅ Ensures exactly 20 character width */
     font-family: monospace; /* ✅ Uses fixed-width font */
     white-space: pre; /* ✅ Prevents whitespace from collapsing */
     overflow: hidden; /* ✅ Hides extra text */
     text-overflow: ellipsis; /* ✅ Adds "..." if text is too long */
-    padding: 0px;
+    padding: 2px 5px;
     border: 1px solid #ddd;
 }
