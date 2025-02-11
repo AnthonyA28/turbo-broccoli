@@ -107,3 +107,15 @@ li:active {
 li.dragging {
     opacity: 0.5;
 }
+
+
+#stringList li {
+    display: inline-block; /* Makes the list items respect width */
+    width: 20ch; /* ✅ Ensures exactly 20 character width */
+    font-family: monospace; /* ✅ Uses fixed-width font */
+    white-space: pre; /* ✅ Prevents whitespace from collapsing */
+    overflow: hidden; /* ✅ Hides extra text */
+    text-overflow: ellipsis; /* ✅ Adds "..." if text is too long */
+    padding: 0px;
+    border: 1px solid #ddd;
+}

@@ -3,9 +3,10 @@ function addCommand() {
     console.log(inputValue);
 
 
-    const newItemText = inputValue;
+    let newItemText = inputValue;
     if (!newItemText.trim()) return; // Don't add empty items
 
+    
     const newItem = document.createElement("li");
     newItem.textContent = newItemText;
     newItem.draggable = true;
