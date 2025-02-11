@@ -76,8 +76,6 @@ function tableTimer() {
         dataIndexTable++;
     }
 
-    console.log("Rows to add:", rowsToAdd.length); // 🔍 Debugging - Check if data exists
-
    if (rowsToAdd.length > 0) {
         rowsToAdd.forEach((row, index) => {
             row.id = `row-${Date.now()}-${index}`; // ✅ Assigns a unique timestamp-based ID

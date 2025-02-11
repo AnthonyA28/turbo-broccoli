@@ -207,6 +207,7 @@ function createWindow() {
             submenu: [
 
                 { label: "toggle port info", click: () => mainWindow.webContents.send('toggle-container', 'container_port') },
+                { label: "toggle commands", click: () => mainWindow.webContents.send('toggle-container', 'container_commands') },
                 { label: "toggle graph", click: () => mainWindow.webContents.send('toggle-container', 'container_graph') },
                 { label: "toggle container 3", click: () => mainWindow.webContents.send('toggle-container', 'container3') },
                 { label: "toggle table", click: () => mainWindow.webContents.send('toggle-container', 'container_table') },

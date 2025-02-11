@@ -22,7 +22,7 @@ body {
     display: flex;
     flex-direction: column; /* Stack elements inside */
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     padding: 10px;
     border: 1px solid #ddd;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -89,3 +89,21 @@ th {
 }
 
 
+
+
+li:nth-child(odd) {
+    background-color: #9e9e9e; /* Gold for odd items */
+}
+
+li:nth-child(even) {
+    background-color: #424242; /* Light green for even items */
+}
+
+
+li:active {
+    cursor: grabbing;
+}
+
+li.dragging {
+    opacity: 0.5;
+}
