@@ -27,8 +27,8 @@ body {
     border: 1px solid #ddd;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     height: 95vh; /* Ensures full height */
-    min-width: 500px; /* Prevents shrinking too much */
     overflow: hidden; /* Prevents unwanted growth */
+/*    min-width: 500px; /* Prevents shrinking too much */*/
 }
 
 /* Hidden State */
@@ -87,4 +87,5 @@ th {
     top: 0;
     z-index: 1;
 }
+
 

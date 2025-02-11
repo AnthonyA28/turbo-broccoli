@@ -203,21 +203,13 @@ function createWindow() {
 
     const customMenu = Menu.buildFromTemplate([
         {
-            label: "Containers",
-            submenu: [
-                { label: "toggle container 1", click: () => mainWindow.webContents.send('toggle-container', 'container1') },
-                { label: "toggle container 2", click: () => mainWindow.webContents.send('toggle-container', 'container2') },
-                { label: "toggle container 3", click: () => mainWindow.webContents.send('toggle-container', 'container3') },
-                { label: "toggle container 4", click: () => mainWindow.webContents.send('toggle-container', 'container4') },
-                { type: 'separator' },
-                { label: "Toggle All Containers", click: () => mainWindow.webContents.send('toggle-container', 'toggle-all') },
-            ]
-        },
-        {
             label: "View",
             submenu: [
-                { role: "reload" },
-                { role: "togglefullscreen" },
+
+                { label: "toggle port info", click: () => mainWindow.webContents.send('toggle-container', 'container_port') },
+                { label: "toggle graph", click: () => mainWindow.webContents.send('toggle-container', 'container_graph') },
+                { label: "toggle container 3", click: () => mainWindow.webContents.send('toggle-container', 'container3') },
+                { label: "toggle table", click: () => mainWindow.webContents.send('toggle-container', 'container_table') },
                 { type: 'separator' },
                 { 
                     label: "Toggle Developer Tools", 
@@ -225,7 +217,7 @@ function createWindow() {
                     click: () => mainWindow.webContents.toggleDevTools()
                 }
             ]
-        }
+        },
     ]);
 
     Menu.setApplicationMenu(customMenu);

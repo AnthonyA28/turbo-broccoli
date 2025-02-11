@@ -9,8 +9,10 @@
 <link rel="stylesheet" href="styles/datatable-min.2.2.2.css">
 
 <script src="includes/plotly.jsv1.58.5.js"></script>
-<script src="includes/jquery-3.7.1.js"></script>
-<script src="includes/datatable-min.2.2.2.js"></script>
+
+    <!-- <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-grid.css"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/styles/ag-theme-alpine.css"> -->
+    <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.js"></script>
 
 </head>
 
@@ -18,7 +20,7 @@
 
 <body>
 
-<div class="container" id="container1">
+<div class="container" id="container_port">
     <form id="serialPortForm">
         <div id="hiddenSection">
             <label for="path">Path:</label>
@@ -99,7 +101,7 @@
     </form>
 </div>
 
-    <div class="container" id="container2"
+    <div class="container" id="container_graph"
 >        <div id="plotlyGraph" style="width: 100%; height: 50%"></div>
     </div>
 
@@ -112,8 +114,8 @@
 
     </div>
 
-    <div class="container" id="container4">
-        <div id="plotlyTable"></div>
+    <div class="container" id="container_table">
+        <div id="myGrid" class="ag-theme-alpine" style="height: 1200px; width: 100%;"></div>
     </div>
 
 </body>
