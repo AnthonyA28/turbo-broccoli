@@ -3,6 +3,32 @@ let dataIndexTable = 0;
 const MAX_ROWS = 200; //
 let isUserScrolling = false;
 
+
+
+
+let tableData = {
+    type: 'table',
+    header: {
+        values: ["<b>Item</b>", "<b>Price</b>", "<b>Quantity</b>","<b>Item</b>", "<b>Price</b>", "<b>Quantity</b>","<b>Item</b>", "<b>Price</b>"],
+        align: "center",
+        line: { width: 1, color: "black" },
+        fill: { color: "lightgrey" },
+        font: { family: "Arial", size: 14, color: "black" }
+    },
+    cells: {
+        values: [[],[],[],[],[],[],[],[],[],[]
+        ],
+        align: "center",
+        line: { color: "black", width: 1 },
+        fill: { color: ["white", "lightblue"] },
+        font: { family: "Arial", size: 12, color: "black" }
+    }
+};
+
+// ✅ Initial Plot
+Plotly.newPlot("plotlyTable", [tableData]);
+
+
 function tableTimer() {
     if (!dataTable) {
         console.error("❌ DataTable is not initialized yet.");
@@ -32,21 +58,16 @@ function tableTimer() {
 
     console.log("Rows to add:", rowsToAdd.length); // 🔍 Debugging - Check if data exists
 
-    if (rowsToAdd.length > 0) {
-        dataTable.rows.add(rowsToAdd).draw(false);
 
-        // ✅ Remove excess rows to keep only 500
-        if (dataTable.rows().count() > MAX_ROWS) {
-            let excessRows = dataTable.rows().count() - MAX_ROWS;
-            dataTable.rows().indexes().slice(0, excessRows).each(function (index) {
-                dataTable.row(index).remove();
-            });
-            dataTable.draw(false);
+    for(var q = 0; q< rowsToAdd.length; q++){
+        for(var i = 0; i < rowsToAdd[q].length; i ++){
+            tableData.cells.values[i].push(rowsToAdd[q][i]);        
         }
-
-    } else {
-        console.warn("⚠️ No new data added to table.");
+        Plotly.react("plotlyTable", [tableData]);
     }
+
+
+
 }
 
 // ✅ Ensure DataTables is initialized before updates start
