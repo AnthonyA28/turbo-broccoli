@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-    "build": {
+  "build": {
     "icon": "assets/icon"
   },
   "scripts": {
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "electron": "^24.0.0",
+    "electron-store": "^10.0.1",
     "serialport": "^10.0.0"
   }
 }

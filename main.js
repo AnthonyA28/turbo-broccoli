@@ -1,8 +1,11 @@
+
+
 const { app, BrowserWindow, Menu, dialog, ipcMain, powerSaveBlocker } = require('electron');
 const path = require('path');
 const { SerialPort } = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
 const fs = require('fs');
+
 
 let mainWindow;
 let globalFilePath = '';
@@ -13,6 +16,13 @@ let unEscapedDelimiter = "\n";
 const blocker = powerSaveBlocker.start('prevent-app-suspension');
 let numIndices; // defined in index.js
 
+let store; // Declare store globally
+
+
+async function setupStore() {
+    const { default: Store } = await import('electron-store');
+    store = new Store();
+}
 
 // Request data from the renderer
 async function requestRendererData() {
@@ -25,11 +35,18 @@ async function requestRendererData() {
     }
 }
 
-// Example: Call this function to request data
-setTimeout(() => {
-    requestRendererData();
-}, 1000); // Delay execution to ensure the window loads
 
+// called immediately
+async function init() {
+    await setupStore();  // Ensure store is initialized
+
+    // Wait until mainWindow is ready
+    while (!mainWindow) {
+        await new Promise(resolve => setTimeout(resolve, 100)); // Poll every 100ms
+    }
+
+    await requestRendererData();  // Now it's safe to call
+} init();
 
 
 // Handle disconnecting from the serial port
@@ -85,6 +102,7 @@ ipcMain.handle('choose-log-folder', async (event, fileName) => {
         }
 
         const folderPath = result.filePaths[0];
+        store.set("folderPath", folderPath);
         console.log("Trying to create a log file with name " + fileName);
         
         globalFilePath = path.join(folderPath, fileName);
@@ -131,6 +149,7 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
 
       currentPort.on('open', () => {
         console.log('Serial port opened');
+        store.set("portPath", currentPort.path);
       });
 
       currentPort.on('error', (err) => {
@@ -282,6 +301,18 @@ app.on('activate', () => {
 async function _listPorts() {
   try {
     const ports = await SerialPort.list();
+    // TODO make last port default
+    // let newPorts = [];
+    // for(var i = 0; i < ports.length; i ++ ){
+    //     if(ports.path == store.portPath && i > 0){
+    //             const tempPort = ports[i];
+    //             newPorts[0] = newPorts[tempPort];
+    //             newPorts.push(tempPort);
+    //     }else{
+    //             newPorts.push(ports[i]);
+    //     }
+    // }
+    // return newPorts;
     return ports;
   } catch (err) {
     console.error('Error listing COM ports:', err.message);
