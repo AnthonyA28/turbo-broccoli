@@ -8,8 +8,6 @@ const fs = require('fs');
 
 
 let mainWindow;
-let globalFilePath = '';
-let globalDataFilePath = '' 
 let currentPort = null;
 let currentParser = null;
 let unEscapedDelimiter = "\n";
@@ -98,12 +96,10 @@ ipcMain.handle('set-store', async(event, newStoreObj) => {
 
 
 ipcMain.handle('choose-log-folder', async (event, fileName) => {
-        // If the fileName is invalid we should reset globalFilePath so we dont try to save; . 
+        
         if(fileName == ""){
-          globalFilePath = "";
           return; 
         }
-        // Open folder picker dialog
         const result = await dialog.showOpenDialog({
             properties: ['openDirectory']
         });
@@ -114,27 +110,31 @@ ipcMain.handle('choose-log-folder', async (event, fileName) => {
 
         const folderPath = result.filePaths[0];
         store.set("folderPath", folderPath);
-        console.log("Trying to create a log file with name " + fileName);
+
+        let filePath = path.join(folderPath, fileName);
+        store.set("fileName", fileName);
         
-        globalFilePath = path.join(folderPath, fileName);
         const dataFileName = "data_" + fileName
-        globalDataFilePath = path.join(folderPath, dataFileName);
+        let dataFilePath = path.join(folderPath, dataFileName);
+        store.set("dataFileName", dataFileName);
 
         try {
             // Create a text file with the specified name
-            fs.writeFileSync(globalFilePath, '');
-            console.log(`File created successfully at ${globalFilePath}`);
+            fs.writeFileSync(filePath, '');
+            console.log(`File created successfully at ${filePath}`);
+
+            
         } catch (error) {
-            globalFilePath = "";
+            filePath = "";
             console.log(`Error creating file: ${error.message}`);
         }
 
         try {
             // Create a text file with the specified name
-            fs.writeFileSync(globalDataFilePath, '');
-            console.log(`File created successfully at ${globalDataFilePath}`);
+            fs.writeFileSync(dataFilePath, '');
+            console.log(`File created successfully at ${dataFilePath}`);
         } catch (error) {
-            globalDataFilePath = "";
+            dataFilePath = "";
             console.log(`Error creating file: ${error.message}`);
         }
 
@@ -192,28 +192,40 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
 });
 
 async function logData(data, parsedData){
-  if(globalFilePath != ""){
-    try {
 
-        // Create a text file with the specified name 
-        const toWrite = data + unEscapedDelimiter;
-        fs.appendFileSync(globalFilePath, toWrite);
-        
-        console.log("logged string: " + parsedData );
 
-        if (parsedData.length != numIndices) {
-            return;
+    const filePath = path.join(store.get("folderPath"), store.get("fileName"));
+    const dataFilePath = path.join(store.get("folderPath"), store.get("dataFileName"));
+    if(filePath != ""){
+        try {
+
+            // Create a text file with the specified name 
+            const toWrite = data + unEscapedDelimiter;
+            fs.appendFileSync(filePath, toWrite);
+            
+
+        } catch (error) {
+            console.log("Failed to log " + data);
         }
-
-        fs.appendFileSync(globalDataFilePath, parsedData.join(",") + "\n");
-        
-        console.log("logged data: " + parsedData );
-        
-
-    } catch (error) {
-        console.log("Failed to log " + data, parsedData );
     }
-  }
+    if(dataFilePath != ""){
+        try {
+
+            if (parsedData.length == numIndices) {
+                fs.appendFileSync(dataFilePath, parsedData.join(",") + "\n");
+                console.log("logged data: " + parsedData );
+                
+            }
+
+            
+            
+
+        } catch (error) {
+            console.log("Failed to log " + parsedData );
+        }
+    }
+
+
 
 }
 
