@@ -107,22 +107,7 @@ function replacePlotData(x, y) {
     }
 
 
-    const sendButton = document.getElementById('sendButton');
-    const messageInput = document.getElementById('messageInput');
-    const outputText = document.getElementById('outputText');
 
-    sendButton.addEventListener('click', () => {
-      const message = messageInput.value;
-      window.electronAPI.sendToSerial(message);
-    });
-
-        // Add event listener for the Enter key on the message input
-    messageInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent the default form submission behavior
-            sendButton.click(); // Simulate a click on the Send button
-        }
-    });
 
 
 function reduceData(parseData) {
@@ -155,6 +140,9 @@ function movingAverageDownsample(arr, n) {
 
     return result;
 }
+
+
+
 
 function plotTimer() {
 
@@ -200,3 +188,22 @@ function plotTimer() {
 
 // Run `plotTimer` every 5 seconds
 const intervalId = setInterval(plotTimer, 300);
+
+
+
+    // const sendButton = document.getElementById('sendButton');
+    // const messageInput = document.getElementById('messageInput');
+    // const outputText = document.getElementById('outputText');
+
+    // sendButton.addEventListener('click', () => {
+    //   const message = messageInput.value;
+    //   window.electronAPI.sendToSerial(message);
+    // });
+
+    //     // Add event listener for the Enter key on the message input
+    // messageInput.addEventListener('keydown', (event) => {
+    //     if (event.key === 'Enter') {
+    //         event.preventDefault(); // Prevent the default form submission behavior
+    //         sendButton.click(); // Simulate a click on the Send button
+    //     }
+    // });

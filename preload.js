@@ -8,6 +8,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     chooseLogFolder: (fileName) => ipcRenderer.invoke('choose-log-folder', fileName),
     onSerialData: (callback) => ipcRenderer.on('serial-data', (event, data) => callback(data)),
 
+    sendDataToMain: (data) => ipcRenderer.send('send-data-to-main', data),
+    onRequestData: (callback) => ipcRenderer.on('request-data-from-main', (_, data) => callback(data)),
+
     // ✅ Add `receive` to listen for events from main.js
     receive: (channel, callback) => {
         ipcRenderer.on(channel, (event, ...args) => callback(...args));

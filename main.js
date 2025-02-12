@@ -6,19 +6,29 @@ const fs = require('fs');
 
 let mainWindow;
 let globalFilePath = '';
-
-// Add these variables at the top of your file to keep track of the port
+let globalDataFilePath = '' 
 let currentPort = null;
 let currentParser = null;
 let unEscapedDelimiter = "\n";
-
-
 const blocker = powerSaveBlocker.start('prevent-app-suspension');
+let numIndices; // defined in index.js
 
 
+// Request data from the renderer
+async function requestRendererData() {
+    if (mainWindow) {
+        const result = await mainWindow.webContents.executeJavaScript(`window.fetchData()`);
+        numIndices = result.numIndices;
+        console.log("Data received from index.js:", result);
+        console.log(numIndices);
+        return result;
+    }
+}
 
-
-
+// Example: Call this function to request data
+setTimeout(() => {
+    requestRendererData();
+}, 1000); // Delay execution to ensure the window loads
 
 
 
@@ -78,16 +88,28 @@ ipcMain.handle('choose-log-folder', async (event, fileName) => {
         console.log("Trying to create a log file with name " + fileName);
         
         globalFilePath = path.join(folderPath, fileName);
+        const dataFileName = "data_" + fileName
+        globalDataFilePath = path.join(folderPath, dataFileName);
 
         try {
             // Create a text file with the specified name
             fs.writeFileSync(globalFilePath, '');
-            return `File created successfully at ${globalFilePath}`;
+            console.log(`File created successfully at ${globalFilePath}`);
         } catch (error) {
             globalFilePath = "";
-            return `Error creating file: ${error.message}`;
+            console.log(`Error creating file: ${error.message}`);
         }
-    });
+
+        try {
+            // Create a text file with the specified name
+            fs.writeFileSync(globalDataFilePath, '');
+            console.log(`File created successfully at ${globalDataFilePath}`);
+        } catch (error) {
+            globalDataFilePath = "";
+            console.log(`Error creating file: ${error.message}`);
+        }
+
+});
 
 
 ipcMain.handle('connect-serial-port', async (event, config) => {
@@ -118,10 +140,15 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
       // Read data from the serial port and send it to the renderer process
       currentParser.on('data', (data) => {
         console.log(`Received data: ${data}`);
-        logData(data);
 
+        const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
+
+        logData(data, parsedData);
+        if (parsedData.length != numIndices) {
+            return;
+        }
           
-        mainWindow.webContents.send('serial-data', data);
+        mainWindow.webContents.send('serial-data', parsedData);
 
       });
 
@@ -132,39 +159,29 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
       return false;
     }
 
-
-    try {
-        const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
-
-        if (parsedData.length > 4) {
-            const xValue = parsedData[3];  // 3rd index
-            const yValue = parsedData[4];  // 4th index
-
-            console.log(`Extracted x: ${xValue}, y: ${yValue}`);
-
-            // Send extracted x, y to the renderer process
-            
-            mainWindow.webContents.send('serialData', { x: xValue, y: yValue });
-            
-        }
-    } catch (error) {
-        console.log("Error parsing serial data:", error);
-    }
-
 });
 
-async function logData(data){
+async function logData(data, parsedData){
   if(globalFilePath != ""){
     try {
+
         // Create a text file with the specified name 
         const toWrite = data + unEscapedDelimiter;
         fs.appendFileSync(globalFilePath, toWrite);
-        console.log("Successfully  logged " + data );
+        
+        console.log("logged string: " + parsedData );
 
+        if (parsedData.length != numIndices) {
+            return;
+        }
 
+        fs.appendFileSync(globalDataFilePath, parsedData.join(",") + "\n");
+        
+        console.log("logged data: " + parsedData );
+        
 
     } catch (error) {
-        console.log("Failed to log " + data );
+        console.log("Failed to log " + data, parsedData );
     }
   }
 

@@ -1,6 +1,6 @@
 let dataTable; // ✅ Global DataTable instance
 let dataIndexTable = 0;
-const MAX_ROWS = 1000000; //
+const MAX_ROWS = 1000; //
 let isUserScrolling = false;
 
 
@@ -76,25 +76,31 @@ function tableTimer() {
         dataIndexTable++;
     }
 
-   if (rowsToAdd.length > 0) {
+    if (rowsToAdd.length > 0) {
         rowsToAdd.forEach((row, index) => {
             row.id = `row-${Date.now()}-${index}`; // ✅ Assigns a unique timestamp-based ID
         });
 
         gridOptions.api.applyTransaction({ add: rowsToAdd, addIndex: 0 });
 
-        // ✅ Keep only `MAX_ROWS` rows by removing the oldest row (from the bottom)
+        // ✅ Keep only `MAX_ROWS` rows by removing the oldest rows (from the bottom)
         const rowCount = gridOptions.api.getDisplayedRowCount();
         if (rowCount > MAX_ROWS) {
-            let lastRowNode = gridOptions.api.getDisplayedRowAtIndex(rowCount - 1);
-            if (lastRowNode) {
-                gridOptions.api.applyTransaction({ remove: [lastRowNode.data] }); // ✅ Uses ID-based removal
+            let excessRows = Math.floor(MAX_ROWS / 2); // ✅ Remove 1/2 of MAX_ROWS
+            let rowsToRemove = [];
+
+            for (let i = 0; i < excessRows; i++) {
+                let lastRowNode = gridOptions.api.getDisplayedRowAtIndex(rowCount - 1 - i);
+                if (lastRowNode) {
+                    rowsToRemove.push(lastRowNode.data);
+                }
+            }
+
+            if (rowsToRemove.length > 0) {
+                gridOptions.api.applyTransaction({ remove: rowsToRemove }); // ✅ Removes multiple rows
             }
         }
-
-
     }
-
 }
 
 

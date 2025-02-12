@@ -1,75 +1,33 @@
-var f64rows = 1000000;
-let numIndices = 10;
-var f64cols = numIndices;
-var float64Array = new Float64Array(f64rows * f64cols).fill(NaN);
-
+const f64rows = 10000000;
+const numIndices = 10;
+const f64cols = numIndices;
+const float64Array = new Float64Array(f64rows * f64cols).fill(NaN);
 let f64IRow = 0;
 
-parseData = []
+
+window.fetchData = async function () {
+    console.log("Renderer: Fetching data...");
+    
+    const data = {
+        numIndices: numIndices
+    };
+
+    console.log("Renderer: Sending data to main", data);
+    return data; // This gets returned to `main.js`
+};
 
 
-
-let addData = false
 window.electronAPI.onSerialData((data) => {
-    // const outputText = document.getElementById('outputText');
-
-    // // Ensure the text area exists before modifying it
-    // if (!outputText) {
-    //     console.error("Element with ID 'outputText' not found.");
-    //     return;
-    // }
-
-    // // Append raw data to the text area
-    // if(addData){
-    //     outputText.value += `${data}\n`;
-    //     outputText.scrollTop = outputText.scrollHeight;
-    // }
-
-    // Parse the incoming data string
-    try {
-        // Remove brackets and split by ";"
-        const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
-        if (parsedData.length != numIndices) {
-            return;
-        }
-
-        for(let i = 0; i < numIndices; i ++ ) {
-            setValue(float64Array, f64IRow, i, f64cols, parsedData[i]); // Set value at row 2, column 3
-        }
-        f64IRow += 1; 
-        if(f64IRow>=float64Array.length){
-            f64IRow = 0;
-        }
-        
-        parseData.push(parsedData);
-        
-        // if (parseData.length > pltMaxItems) {
-            // parseData = reduceData(parseData);
-            // const { x, y } = extractXY(parseData);
-            // replacePlotData(x,y);
-        // }
-
-
-        // if (parsedData.length > pltIndexX) {
-            // const xValue = parsedData[pltIndexX];  // 3rd index
-            // const yValue = parsedData[pltIndexY];  // 4th index
-
-            // console.log(`Parsed X: ${xValue}, Y: ${yValue}`);
-
-            // Update the Plotly graph
-            // updatePlot(xValue, yValue);
-
-            // renderTable(parseData)
-
-        // } else {
-        //     console.warn("Invalid data format received:", data);
-        // }
-    } catch (error) {
-        console.error("Error parsing serial data:", error);
+    // data.length == f64cols confirmed prior to this function. 
+    for(let i = 0; i < data.length; i ++ ) {
+        setValue(float64Array, f64IRow, i, f64cols, data[i]); 
     }
+    f64IRow += 1; 
+    if(f64IRow>=f64rows){
+        //TODO
+    }
+
 });
-
-
 
 
 async function populatePorts() {
@@ -91,11 +49,7 @@ async function populatePorts() {
 
 // Add event listener for the refresh button
 document.getElementById('refreshPorts').addEventListener('click', populatePorts);
-
-// Initial population of ports
 populatePorts();
-
-
 
 
 async function connectDisconnect() {
@@ -128,7 +82,6 @@ async function connectDisconnect() {
     const flowControl = document.getElementById('flowControl').value === 'true';
     const delimiter = document.getElementById('delimiter').value;
 
-
     console.log('Delimiter:', JSON.stringify(delimiter));
 
     const connectionSucessful = await electronAPI.connectSerialPort({
@@ -154,7 +107,6 @@ async function connectDisconnect() {
 }
 
 
-
 async function chooseFolder(){
     const logDataCheckbox = document.getElementById('logDataCheckbox');
     const isLoggingEnabled = logDataCheckbox.checked;
@@ -168,8 +120,6 @@ async function chooseFolder(){
 
 
 async function initFileName(){
-    console.log("initiFileName");
-
     function getCurrentDateTime() {
         const now = new Date();
         const year = now.getFullYear();
@@ -184,7 +134,6 @@ async function initFileName(){
 
     // Set the value of the textbox to the current date and time
     document.getElementById('fileName').value =  getCurrentDateTime() + ".csv";
-
 }
 
 initFileName();
