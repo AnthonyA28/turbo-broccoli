@@ -6,10 +6,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     connectSerialPort: (config) => ipcRenderer.invoke('connect-serial-port', config),
     disconnectSerialPort: () => ipcRenderer.invoke('disconnect-serial-port'),
     chooseLogFolder: (fileName) => ipcRenderer.invoke('choose-log-folder', fileName),
+    
     onSerialData: (callback) => ipcRenderer.on('serial-data', (event, data) => callback(data)),
 
     sendDataToMain: (data) => ipcRenderer.send('send-data-to-main', data),
     onRequestData: (callback) => ipcRenderer.on('request-data-from-main', (_, data) => callback(data)),
+
+
+    getStore: () => ipcRenderer.invoke('get-store'),
+    setStore: (newStoreObj) => ipcRenderer.invoke('set-store', newStoreObj),
 
     // ✅ Add `receive` to listen for events from main.js
     receive: (channel, callback) => {

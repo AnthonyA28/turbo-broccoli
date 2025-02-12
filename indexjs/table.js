@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function tableTimer() {
+    if(!portConnected) return;
     if (!gridOptions.api) return; // ✅ Ensure grid is ready
 
     let exit = false;

@@ -3,6 +3,12 @@ const numIndices = 10;
 const f64cols = numIndices;
 const float64Array = new Float64Array(f64rows * f64cols).fill(NaN);
 let f64IRow = 0;
+let storeObj = {};
+
+
+function portConnected(){
+    return document.getElementById("connectButton").innerHTML == "Disconnect"
+}
 
 
 window.fetchData = async function () {
@@ -79,8 +85,10 @@ async function connectDisconnect() {
     const stopBits = parseInt(document.getElementById('stopBits').value);
     const startBits = parseInt(document.getElementById('startBits').value);
     const parity = document.getElementById('parity').value;
-    const flowControl = document.getElementById('flowControl').value === 'true';
+    const flowControl = document.getElementById('flowControl').value;
     const delimiter = document.getElementById('delimiter').value;
+
+
 
     console.log('Delimiter:', JSON.stringify(delimiter));
 
@@ -101,6 +109,22 @@ async function connectDisconnect() {
         const section = document.getElementById('hiddenSection');
         section.classList.add('locked');
         document.getElementById("connectButton").innerHTML = "Disconnect"
+        
+        storeObj.baudRate = baudRate;
+        storeObj.dataBits = dataBits;
+        storeObj.stopBits = stopBits;
+        storeObj.startBits = startBits;
+        storeObj.parity = parity;
+        storeObj.flowControl = flowControl;
+        storeObj.delimiter = delimiter;
+
+        window.electronAPI.setStore(storeObj);
+
+
+        document.getElementById('container_port').querySelectorAll('input, select, textarea, button')
+            .forEach(element => element.disabled = true);
+        toggleContainer('container_port');
+
     }
 
     
@@ -137,5 +161,56 @@ async function initFileName(){
 }
 
 initFileName();
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    window.electronAPI.getStore().then(store => {
+        storeObj = store; 
+
+        document.getElementById('baudRate').value = storeObj.baudRate;
+        document.getElementById('dataBits').value = storeObj.dataBits;
+        document.getElementById('stopBits').value = storeObj.stopBits;
+        document.getElementById('startBits').value = storeObj.startBits;
+        document.getElementById('parity').value = storeObj.parity;
+        // document.getElementById('flowControl').value = storeObj..flowControl 
+        document.getElementById('delimiter').value = storeObj.delimiter;
+
+        // document.getElementById('portSelect').value;
+
+        const flowControlDropdown = document.getElementById('flowControl');
+        if (["true", "false"].includes(String(storeObj.flowControl))) {
+            flowControlDropdown.value = String(storeObj.flowControl);
+        } else {
+            console.warn("Invalid flowControl value:", storeObj.flowControl);
+        }
+
+        const portSelect = document.getElementById('portSelect');
+        const portPath = String(storeObj.portPath); // Ensure it's a string
+        let found = false;
+
+        // Loop through all dropdown options
+        for (const option of portSelect.options) {
+            if (option.value.includes(portPath)) { // ✅ Checks for substring match
+                portSelect.value = option.value; // Select the matching option
+                found = true;
+                console.log("found port on dropdown :", portPath);
+                break; // Stop searching after the first match
+            }
+        }
+
+        // Handle case where no matching option was found
+        if (!found) {
+            console.log("No matching port found for:", portPath);
+        }
+
+
+    }).catch(err => {
+        console.error("Error fetching store:", err);
+    });
+
+
+});
 
 

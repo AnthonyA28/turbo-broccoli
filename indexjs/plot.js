@@ -145,7 +145,8 @@ function movingAverageDownsample(arr, n) {
 
 
 function plotTimer() {
-
+    if(!portConnected) return;
+    
     let  moreX = []
     let  moreY = []
     while( dataIndex <  f64rows){

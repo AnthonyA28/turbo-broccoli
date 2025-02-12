@@ -49,6 +49,10 @@ async function init() {
 } init();
 
 
+ipcMain.handle('get-store', async () => {
+    return JSON.parse(JSON.stringify(store.store)); // Ensures serialization
+});
+
 // Handle disconnecting from the serial port
 ipcMain.handle('disconnect-serial-port', async () => {
     if (currentPort) {
@@ -84,6 +88,13 @@ ipcMain.handle('disconnect-serial-port', async () => {
         return false; // No port was open
     }
 });
+
+
+ipcMain.handle('set-store', async(event, newStoreObj) => {
+    const existingStore = store.store; // Get current store values
+    const updatedStore = { ...existingStore, ...newStoreObj }; // Merge new data
+    store.set(updatedStore);
+})
 
 
 ipcMain.handle('choose-log-folder', async (event, fileName) => {
@@ -299,26 +310,16 @@ app.on('activate', () => {
 
 // Called by populatePorts()
 async function _listPorts() {
-  try {
-    const ports = await SerialPort.list();
-    // TODO make last port default
-    // let newPorts = [];
-    // for(var i = 0; i < ports.length; i ++ ){
-    //     if(ports.path == store.portPath && i > 0){
-    //             const tempPort = ports[i];
-    //             newPorts[0] = newPorts[tempPort];
-    //             newPorts.push(tempPort);
-    //     }else{
-    //             newPorts.push(ports[i]);
-    //     }
-    // }
-    // return newPorts;
-    return ports;
-  } catch (err) {
-    console.error('Error listing COM ports:', err.message);
-    return [];
-  }
+    try {
+        const ports = await SerialPort.list();
+        
+        return ports;
+    } catch (err) {
+        console.error('Error listing COM ports:', err.message);
+        return [];
+    }
 }
+
 
 // IPC handler to send list of ports to renderer process
 ipcMain.handle('list-ports', async () => {
