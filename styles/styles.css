@@ -124,3 +124,23 @@ li.dragging {
     padding: 2px 5px;
     border: 1px solid #ddd;
 }
+
+
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid #ccc;
+    max-height: 75px;
+    overflow-y: auto;
+    background: #222831;
+    width: 200px;
+    top: 57px;  
+}
+.autocomplete-items div {
+    padding: 1px;
+    cursor: pointer;
+}
+.autocomplete-items div:hover {
+    background: #9e9e9e;
+}
+
+

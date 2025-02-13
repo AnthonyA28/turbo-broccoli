@@ -1,6 +1,56 @@
 const list = document.getElementById("stringList");
 
 
+const commandAutoComplete = [
+"submit_commandList", "start_commandList", "stop", "set_pos", "set_speed", "move_to"
+
+];
+
+const input = document.getElementById("commandInput");
+const autocompleteList = document.getElementById("autocompleteCommands");
+
+input.addEventListener("input", function () {
+    let query = this.value.toLowerCase();
+    autocompleteList.innerHTML = ""; // Clear previous suggestions
+
+    if (!query) return; // Stop if input is empty
+
+    commandAutoComplete
+      .filter(cmd => cmd.startsWith(query)) // Match only commands that start with input
+      .forEach(match => {
+        const itemDiv = document.createElement("div");
+        itemDiv.textContent = match;
+        itemDiv.addEventListener("click", function () {
+          input.value = match; // Fill input with selected command
+          autocompleteList.innerHTML = ""; // Clear suggestions
+        });
+        autocompleteList.appendChild(itemDiv);
+      });
+});
+
+
+
+document.getElementById("commandInput").addEventListener("keydown", function(event) {
+    const input = document.getElementById("commandInput");
+    const autocompleteList = document.getElementById("autocompleteCommands");
+
+    // Enter key triggers button click
+    if (event.key === "Enter") {  
+        event.preventDefault();  // Prevent form submission
+        document.getElementById("submitCommandBtn").click(); // Trigger button click
+    }
+
+});
+
+
+
+function listUpdated(){
+    const listItems = document.querySelectorAll("#stringList li"); 
+    const stringList = Array.from(listItems).map(item => item.textContent.trim());
+    const cleanedStrings = stringList.map(str => str.replace("❌", "").trim());
+    window.electronAPI.setCommandList(cleanedStrings);
+}
+
 function addCommand() {
     let inputValue = document.getElementById("commandInput").value;
     if (!inputValue.trim()) return; // Don't add empty items
@@ -49,6 +99,8 @@ function addCommand() {
     // Append the list item to the list
     list.appendChild(newItem);
     document.getElementById("commandInput").value = ""; // Clear input field
+
+    listUpdated();
 }
 
 document.getElementById("addCommandBtn").addEventListener("click", addCommand);
@@ -56,12 +108,24 @@ document.getElementById("addCommandBtn").addEventListener("click", addCommand);
 
 
 function submitCommand(){
+
+    if(list.childElementCount == 0){
+
+        let command = document.getElementById("commandInput").value;
+        if (!command.trim()) return; // Don't add empty items
+
+        window.electronAPI.sendNextCommand(command);
+        return;
+    }
+
     console.log("Submitting command")
     let nextItem = list.firstElementChild; // Gets the last <li> item
 
     if (nextItem) {
         console.log("Last item:", nextItem.textContent); // Logs the text content of the last item
         list.removeChild(nextItem);
+        const command = nextItem.textContent.replace("❌", "").trim();
+        window.electronAPI.sendNextCommand(command);
     } else {
         console.log("The list is empty.");
     }
@@ -69,8 +133,6 @@ function submitCommand(){
 }
 
 document.getElementById("submitCommandBtn").addEventListener("click", submitCommand);
-
-
 
 
 let draggedItem = null;
@@ -93,6 +155,7 @@ list.addEventListener("dragover", function(event) {
 list.addEventListener("dragend", function(event) {
     event.target.style.opacity = "1";
     draggedItem = null;
+    listUpdated();
 });
 
 function getDragAfterElement(container, y) {

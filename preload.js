@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     connectSerialPort: (config) => ipcRenderer.invoke('connect-serial-port', config),
     disconnectSerialPort: () => ipcRenderer.invoke('disconnect-serial-port'),
     chooseLogFolder: (fileName) => ipcRenderer.invoke('choose-log-folder', fileName),
+    setCommandList: (newCommandList) => ipcRenderer.invoke('set-newCommandList', newCommandList),
+    sendNextCommand: (nextCommand) => ipcRenderer.invoke('send-next-command', nextCommand),
     
     onSerialData: (callback) => ipcRenderer.on('serial-data', (event, data) => callback(data)),
 

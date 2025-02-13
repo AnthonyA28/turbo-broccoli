@@ -16,6 +16,8 @@ let numIndices; // defined in index.js
 
 let store; // Declare store globally
 
+var commandList = [];
+
 
 async function setupStore() {
     const { default: Store } = await import('electron-store');
@@ -95,6 +97,30 @@ ipcMain.handle('set-store', async(event, newStoreObj) => {
 })
 
 
+ipcMain.handle('set-newCommandList', async (event, newCommandList) => {
+    commandList = newCommandList;
+    console.log("commandList: " + commandList);
+})
+
+ipcMain.handle('send-next-command', async (event, nextCommand) => {
+    console.log("sending next command : " + nextCommand);
+    console.log("commandList  ", commandList)
+
+    nextCommand = nextCommand + ";"
+    
+    currentPort.write(nextCommand + '\n', (err) => {  // Ensure a newline character is sent
+    if (err) {
+      console.error('Error on write: ', err.nextCommand);
+    }
+    console.log('Message written: ', nextCommand);
+  });
+
+    commandList.pop()
+    console.log("commandList after pop  ", commandList)
+
+})
+
+
 ipcMain.handle('choose-log-folder', async (event, fileName) => {
         
         if(fileName == ""){
@@ -169,7 +195,7 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
 
       // Read data from the serial port and send it to the renderer process
       currentParser.on('data', (data) => {
-        console.log(`Received data: ${data}`);
+        // console.log(`Received data: ${data}`);
 
         const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
 
@@ -213,7 +239,7 @@ async function logData(data, parsedData){
 
             if (parsedData.length == numIndices) {
                 fs.appendFileSync(dataFilePath, parsedData.join(",") + "\n");
-                console.log("logged data: " + parsedData );
+                // console.log("logged data: " + parsedData );
                 
             }
 
@@ -230,12 +256,12 @@ async function logData(data, parsedData){
 }
 
 ipcMain.on('send-to-serial', (event, message) => {
-  currentPort.write(message + '\n', (err) => {  // Ensure a newline character is sent
+    currentPort.write(message + '\n', (err) => {  // Ensure a newline character is sent
     if (err) {
       console.error('Error on write: ', err.message);
     }
     console.log('Message written: ', message);
-  });
+    });
 });
 
 
