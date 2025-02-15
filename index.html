@@ -101,6 +101,18 @@
         <button type="button" id="connectButton" onclick="connectDisconnect()">Connect</button>
     </form>
 </div>
+
+<div class="container" id="container_commands" style="max-width: 250px; align-items: center">
+
+        <div class="nav-container" style="display: flex; justify-content: center; align-items: center; gap: 10px; text-align: center;">
+            <button id="move-left">&laquo;</button>
+            <input type="number" id="slide-input" step="1" min="1" value="1" style="max-width: 50px; text-align: center;">
+            <button id="move-right">&raquo;</button>
+        </div>
+
+
+</div>
+
     <div class="container" id="container_commands" style="max-width: 250px;">
         <label for="commandInput">Command:</label>
         <input type="text" id="commandInput" placeholder="Command">
@@ -124,7 +136,6 @@
             <input type="text" id="messageInput" placeholder="Enter message" style="flex: 1;">
             <button id="sendButton">Send</button>
         </div>
-
     </div>
 
     <div class="container" id="container_table">

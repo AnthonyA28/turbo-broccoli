@@ -53,9 +53,56 @@ async function populatePorts() {
     }
 }
 
-// Add event listener for the refresh button
+
+
+function setupControls(){
+    pressed_direction = ""
+    isPressed = false; 
+    function pressed() {
+        if(isPressed){
+            console.log("moving to " + pressed_direction); // Replace this with your desired action
+            var distance = parseFloat(document.getElementById('slide-input').value)/5;
+            if(distance < 1) {
+                distance = 1;
+            }
+            if(pressed_direction == "left"){
+                distance = distance * -1; 
+            }
+            var command = "slide " + distance.toFixed(0) + ";";
+            console.log(command); 
+            window.electronAPI.sendToSerial(command);
+        }
+    }
+    setInterval(pressed, 200);
+
+    document.getElementById('move-left').addEventListener('mousedown', function(){
+        isPressed = true; 
+        pressed_direction = "left";
+        console.log("move-left");
+        var speed = parseFloat(document.getElementById('slide-input').value);
+        var command = "set_speed " + speed.toFixed(0) + ";";
+        window.electronAPI.sendToSerial(command);
+    });
+    document.getElementById('move-right').addEventListener('mousedown', function(){
+        isPressed = true; 
+        pressed_direction = "right";
+        console.log("move-right");
+        var speed = parseFloat(document.getElementById('slide-input').value);
+        var command = "set_speed " + speed.toFixed(0) + ";";
+        window.electronAPI.sendToSerial(command);
+    });
+    // document.getElementById('refreshPorts').addEventListener('move-right', move_right);
+    document.addEventListener("mouseup", function() {
+        if (isPressed) {
+            window.electronAPI.sendToSerial('stop;');
+            console.log("Button Released!");
+            isPressed = false;
+        }
+    });
+}
+setupControls();
+
 document.getElementById('refreshPorts').addEventListener('click', populatePorts);
-populatePorts();
 
 
 async function connectDisconnect() {
