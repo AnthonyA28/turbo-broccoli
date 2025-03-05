@@ -102,18 +102,25 @@
     </form>
 </div>
 
-<div class="container" id="container_commands" style="max-width: 250px; align-items: center">
-
-        <div class="nav-container" style="display: flex; justify-content: center; align-items: center; gap: 10px; text-align: center;">
-            <button id="move-left">&laquo;</button>
-            <input type="number" id="slide-input" step="1" min="1" value="1" style="max-width: 50px; text-align: center;">
-            <button id="move-right">&raquo;</button>
-        </div>
+<!-- <div class="container" id="container_commands" style="max-width: 250px; align-items: center">
 
 
-</div>
+
+</div> -->
 
     <div class="container" id="container_commands" style="max-width: 250px;">
+
+
+        <div class="nav-container" style="display: flex; justify-content: center; align-items: center; gap: 10px; text-align: center;">
+            <button id="move-left" style="width: 60px; text-align: center;">&laquo;</button>
+            <input type="number" id="slide-input" step="1" min="1" value="1" style="max-width: 50px; text-align: center;">
+            <button id="move-right"  style="width: 60px; text-align: center;">&raquo;</button>
+        </div>
+        <!-- <br> -->
+        <button id="stop" style="width: 200px; text-align: center;"> Stop </button>
+
+        <br>
+
         <label for="commandInput">Command:</label>
         <input type="text" id="commandInput" placeholder="Command">
         <div id="autocompleteCommands" class="autocomplete-items"></div>

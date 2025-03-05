@@ -132,8 +132,8 @@ li.dragging {
     max-height: 75px;
     overflow-y: auto;
     background: #222831;
-    width: 200px;
-    top: 57px;  
+    width: 150px;
+    top: 117px;  
 }
 .autocomplete-items div {
     padding: 1px;
