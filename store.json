@@ -1,0 +1,22 @@
+{
+	"theme": "dark",
+	"portPath": "COM11",
+	"baudRate": 9600,
+	"dataBits": 8,
+	"stopBits": 0,
+	"startBits": 0,
+	"parity": "none",
+	"flowControl": "true",
+	"delimiter": "\\n",
+	"folderPath": "C:\\Users\\antho\\Downloads\\log",
+	"fileName": "2025-02-12--01-20-35.csv",
+	"dataFileName": "data_2025-02-12--01-20-35.csv",
+	"ticks_per_second": 1000,
+	"steps_per_micron": 10,
+	"force_base_line1": 8698601,
+	"force_slope1": 0.0000894,
+	"force_base_line2": 85093204,
+	"force_slope2": 0.0000929,
+    "column_names": ["Target pos[μm]", "speed [μm]", "position [μm]", "time [s]", "Force1 [N]", "Force2 [N]", "", "","","",""]
+
+}

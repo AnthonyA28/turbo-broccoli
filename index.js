@@ -1,9 +1,22 @@
 const f64rows = 10000000;
-const numIndices = 10;
+const numIndices = 11;
 const f64cols = numIndices;
 const float64Array = new Float64Array(f64rows * f64cols).fill(NaN);
 let f64IRow = 0;
 let storeObj = {};
+
+// Index   Final Value Assigned
+// 0   target_pos
+// 1   speed
+// 2   steps
+// 3   HAL_GetTick()
+// 4   Force 1 -- HX711_Read()
+// 5   Force 2 -- HX711_Read2()
+// 6   parse_command_list
+// 7   run_command_list
+// 8   command_done
+// 9   command_list_current_index 
+// 10  command_list_index
 
 
 function portConnected(){
@@ -25,7 +38,11 @@ window.fetchData = async function () {
 
 window.electronAPI.onSerialData((data) => {
     // data.length == f64cols confirmed prior to this function. 
+
+
+    
     for(let i = 0; i < data.length; i ++ ) {
+
         setValue(float64Array, f64IRow, i, f64cols, data[i]); 
     }
     f64IRow += 1; 
@@ -207,11 +224,11 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("No matching port found for:", portPath);
         }
 
+        loadTable();
 
     }).catch(err => {
         console.error("Error fetching store:", err);
     });
-
 
 });
 

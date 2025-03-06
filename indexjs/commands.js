@@ -3,7 +3,6 @@ const list = document.getElementById("stringList");
 
 const commandAutoComplete = [
 "submit_commandList", "start_commandList", "stop", "set_pos", "set_speed", "move_to"
-
 ];
 
 const input = document.getElementById("commandInput");
@@ -107,12 +106,34 @@ document.getElementById("addCommandBtn").addEventListener("click", addCommand);
 
 
 
+function transformCommand(commandString) {
+    const parts = commandString.split(' '); // Split by space
+    if (parts.length !== 2) {
+        console.error("Invalid command format");
+        return null;
+    }
+
+    const command = parts[0]; // First part is the command
+    let number = parseFloat(parts[1]); // Convert the second part to a number
+
+    if (isNaN(number)) {
+        console.error("Invalid number in command");
+        return null;
+    }
+
+    number *= storeObj["steps_per_micron"]; 
+
+    return `${command} ${number}`; // Return new formatted string
+}
+
+
 function submitCommand(){
 
     if(list.childElementCount == 0){
 
         let command = document.getElementById("commandInput").value;
-        if (!command.trim()) return; // Don't add empty items
+        command = transformCommand(command)
+        if (!command.trim() || command == null) return;
 
         window.electronAPI.sendNextCommand(command);
         return;
@@ -182,7 +203,7 @@ function setupControls(){
     function pressed() {
         if(isPressed){
             console.log("moving to " + pressed_direction); // Replace this with your desired action
-            var distance = parseFloat(document.getElementById('slide-input').value)/5;
+            var distance = parseFloat(document.getElementById('slide-input').value)*storeObj["steps_per_micron"];
             if(distance < 1) {
                 distance = 1;
             }
@@ -194,13 +215,13 @@ function setupControls(){
             window.electronAPI.sendToSerial(command);
         }
     }
-    setInterval(pressed, 200);
+    setInterval(pressed, 1000);
 
     document.getElementById('move-left').addEventListener('mousedown', function(){
         isPressed = true; 
         pressed_direction = "left";
         console.log("move-left");
-        var speed = parseFloat(document.getElementById('slide-input').value);
+        var speed = parseFloat(document.getElementById('slide-input').value*storeObj["steps_per_micron"]);
         var command = "set_speed " + speed.toFixed(0) + ";";
         window.electronAPI.sendToSerial(command);
     });
@@ -208,7 +229,7 @@ function setupControls(){
         isPressed = true; 
         pressed_direction = "right";
         console.log("move-right");
-        var speed = parseFloat(document.getElementById('slide-input').value);
+        var speed = parseFloat(document.getElementById('slide-input').value*storeObj["steps_per_micron"]);
         var command = "set_speed " + speed.toFixed(0) + ";";
         window.electronAPI.sendToSerial(command);
     });

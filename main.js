@@ -1,4 +1,4 @@
-
+//C:\Users\antho\AppData\Roaming\ElectroLink
 
 const { app, BrowserWindow, Menu, dialog, ipcMain, powerSaveBlocker } = require('electron');
 const path = require('path');
@@ -22,6 +22,33 @@ var commandList = [];
 async function setupStore() {
     const { default: Store } = await import('electron-store');
     store = new Store();
+
+    const storeFileName = 'store.json'; // Change this to your store file name
+    const storeFilePath = path.join(__dirname, storeFileName);
+
+    if (fs.existsSync(storeFilePath)) {
+        console.log(`Store file found: ${storeFilePath}`);
+        try {
+            const storeData = fs.readFileSync(storeFilePath, 'utf8');
+            console.log('Store file content:', storeData);
+            // Optionally parse the JSON data and merge it into the store
+            const parsedData = JSON.parse(storeData);
+            Object.entries(parsedData).forEach(([key, value]) => {
+                console.log("Setting " + key + " to " + value);
+                store.set(key, value);
+            });
+        } catch (error) {
+            console.error('Error reading store file:', error);
+        }
+    } else {
+        console.log(`Store file not found in the current directory. Creating a new store...`);
+        try {
+            fs.writeFileSync(storeFilePath, JSON.stringify(store.store, null, 2));
+            console.log('New store file created:', storeFilePath);
+        } catch (error) {
+            console.error('Error creating store file:', error);
+        }
+    }
 }
 
 // Request data from the renderer
@@ -195,14 +222,23 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
 
       // Read data from the serial port and send it to the renderer process
       currentParser.on('data', (data) => {
-        // console.log(`Received data: ${data}`);
+        console.log(`Received data: ${data}`);
 
         const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
 
-        logData(data, parsedData);
         if (parsedData.length != numIndices) {
             return;
         }
+
+
+        parsedData[0] = parsedData[0]/store.get("steps_per_micron");
+        parsedData[1] = parsedData[1]/store.get("steps_per_micron");
+        parsedData[2] = parsedData[2]/store.get("steps_per_micron");
+        parsedData[3] = parsedData[3]/store.get("ticks_per_second");
+        parsedData[4] = (parsedData[4]-store.get("force_base_line1"))*store.get("force_slope1");
+        parsedData[5] = (parsedData[5]-store.get("force_base_line2"))*store.get("force_slope2");
+
+        logData(data, parsedData);
           
         mainWindow.webContents.send('serial-data', parsedData);
 
