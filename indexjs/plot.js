@@ -44,7 +44,81 @@ const layout = {
         },
     };
 
+
+// Function to handle dropdown selection
+function plotDropDownChanged(event) {
+    const selectedIndex = event.target.selectedIndex;
+    console.log(`Dropdown ${event.target.id} selected value: ${event.target.value}, index: ${selectedIndex}`);
+
+    const extracted = event.target.id.replace("plot", "").replace("_dropdown", "");
+    console.log("Replacing " + extracted + " to " +  selectedIndex);
+
+    let updatePlot = false; 
+    if(extracted == "x1"){
+        pltIndexX = selectedIndex;
+        updatePlot = true; 
+    }else if(extracted == "y1"){
+        pltIndexY = selectedIndex;
+        updatePlot= true; 
+    }
+
+    if(updatePlot){
+        let xData = Array.from(getColumnUpToRow(float64Array, pltIndexX, dataIndex-1, f64cols));
+        let yData = Array.from(getColumnUpToRow(float64Array, pltIndexY, dataIndex-1, f64cols));
+        xData = movingAverageDownsample(xData, maxPlotPoints/2);
+        yData = movingAverageDownsample(yData, maxPlotPoints/2);
+        replacePlotData(xData, yData)
+    }
+}
+
+// Get all dropdowns by class
+document.querySelectorAll('.plot_dropdown').forEach(dropdown => {
+    dropdown.addEventListener('change', plotDropDownChanged);
+});
+
+function set_dropdown_options(){
+    let dropdown_names = storeObj["column_names"]; // Assuming this is an array of strings
+    console.log(dropdown_names)
+
+    const plotx1_dropdown = document.getElementById('plotx1_dropdown');
+    const ploty1_dropdown = document.getElementById('ploty1_dropdown');
+    const plotx2_dropdown = document.getElementById('plotx2_dropdown');
+    const ploty2_dropdown = document.getElementById('ploty2_dropdown');
+
+    dropdown_names.forEach(name => {
+        let option1 = document.createElement('option');
+        option1.value = name;
+        option1.text = name;
+        plotx1_dropdown.appendChild(option1);
+
+        let option2 = document.createElement('option');
+        option2.value = name;
+        option2.text = name;
+        ploty1_dropdown.appendChild(option2);
+
+        let option3 = document.createElement('option');
+        option3.value = name;
+        option3.text = name;
+        plotx2_dropdown.appendChild(option3);
+
+        let option4 = document.createElement('option');
+        option4.value = name;
+        option4.text = name;
+        ploty2_dropdown.appendChild(option4);
+    });
+
+    
+
+    if (plotx1_dropdown.options.length > pltIndexX) plotx1_dropdown.selectedIndex = pltIndexX;
+    if (ploty1_dropdown.options.length > pltIndexY) ploty1_dropdown.selectedIndex = pltIndexY;
+    // if (plotx2_dropdown.options.length > defaultIndex) plotx2_dropdown.selectedIndex = defaultIndex;
+    // if (ploty2_dropdown.options.length > defaultIndex) ploty2_dropdown.selectedIndex = defaultIndex;
+
+}
+
+
 function createPlot() {
+    set_dropdown_options();
     const data = [{
         x: [],
         y: [],
@@ -55,13 +129,9 @@ function createPlot() {
         marker: { color: "#000000", size: 6 } // Black markers with a moderate size
     }];
 
-    
-
     Plotly.newPlot('plotlyGraph', data, layout);
 }
 
-// Run this function once at the beginning
-createPlot()
 
 function updatePlot(x, y) {
     const graphDiv = document.getElementById('plotlyGraph');
@@ -156,17 +226,10 @@ function plotTimer() {
             // dataIndex = dataIndex - 1; 
             break;
         }
-        // xData[dataIndex] = valueX;
-        // yData[dataIndex] = valueY;
         moreX.push(valueX);
         moreY.push(valueY);
         dataIndex = dataIndex + 1; 
     }
-    // let xData = getColumnUpToRow(float64Array, pltIndexX, f64rows, f64cols);
-    // let yData = getColumnUpToRow(float64Array, pltIndexY, f64rows, f64cols);
-
-
-    // replacePlotData(xData, yData);
     const graphDiv = document.getElementById('plotlyGraph');
 
     if(graphDiv.data[0].x.length > maxPlotPoints){
@@ -187,24 +250,4 @@ function plotTimer() {
 
 }
 
-// Run `plotTimer` every 5 seconds
 const intervalId = setInterval(plotTimer, 300);
-
-
-
-    // const sendButton = document.getElementById('sendButton');
-    // const messageInput = document.getElementById('messageInput');
-    // const outputText = document.getElementById('outputText');
-
-    // sendButton.addEventListener('click', () => {
-    //   const message = messageInput.value;
-    //   window.electronAPI.sendToSerial(message);
-    // });
-
-    //     // Add event listener for the Enter key on the message input
-    // messageInput.addEventListener('keydown', (event) => {
-    //     if (event.key === 'Enter') {
-    //         event.preventDefault(); // Prevent the default form submission behavior
-    //         sendButton.click(); // Simulate a click on the Send button
-    //     }
-    // });

@@ -225,6 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         loadTable();
+        createPlot();
 
     }).catch(err => {
         console.error("Error fetching store:", err);

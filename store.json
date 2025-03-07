@@ -17,6 +17,6 @@
 	"force_slope1": 0.0000894,
 	"force_base_line2": 85093204,
 	"force_slope2": 0.0000929,
-    "column_names": ["Target pos[μm]", "speed [μm]", "position [μm]", "time [s]", "Force1 [N]", "Force2 [N]", "", "","","",""]
+    "column_names": ["Target pos[μm]", "speed [μm]", "position [μm]", "time [s]", "Force1 [N]", "Force2 [N]", "parse_command_list", "run_command_list","command_done","command_list_current_index","command_list_index"]
 
 }
