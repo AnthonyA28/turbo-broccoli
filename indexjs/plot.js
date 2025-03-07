@@ -1,6 +1,8 @@
 
 let pltIndexX = 3; 
 let pltIndexY = 4;
+let pltIndexX2 = 3; 
+let pltIndexY2 = 5;
 const maxPlotPoints = 10000;
 const xData = [];
 const yData = [];
@@ -8,44 +10,98 @@ let dataIndex = 0;
 
 
 const layout = {
-        // title: 'Real-Time Serial Data',
-        showlegend: false, // Hides legend
-        font: { family: "Segoe UI", size: 14, color: "#000000" }, // Global font settings
-        margin: { b: 100, l: 100, r: 30, t: 30 }, // Margins for better spacing
-        width: "100%", // Fit to parent element width
-        height: "100%", // Fit to parent element height
-        paper_bgcolor: "#FFFFFF", // White background
-        plot_bgcolor: "#FFFFFF", // White plot area
-        autosize: true, // Enable automatic resizing
-        xaxis: {
-            title: { text: "X", font: { color: "#000000" }, standoff: 0 },
-            type: "linear",
-            mirror: "ticks",
-            zeroline: false, // Removes zero line
-            ticks: "inside",
-            ticklen: 5,
-            tickcolor: "#000000",
-            linecolor: "#000000",
-            showgrid: false, // No grid lines
-            minor: { showgrid: false, ticks: "inside", ticklen: 2, tickcolor: "#000000" }
-        },
-        yaxis: {
-            title: { text: "Y", font: { color: "#000000" }, standoff: 0 },
-            range: [null, null], // Auto-scale
-            type: "linear",
-            mirror: "ticks",
-            zeroline: false,
-            ticks: "inside",
-            ticklen: 5,
-            tickcolor: "#000000",
-            linecolor: "#000000",
-            showgrid: false,
-            minor: { showgrid: false, ticks: "inside", ticklen: 2, tickcolor: "#000000" }
-        },
-    };
+    showlegend: false, 
+    font: { family: "Segoe UI", size: 14, color: "#000000" }, // Default font color for everything else
+    margin: { b: 100, l: 100, r: 100, t: 100 },
+    width: "100%",
+    height: "100%",
+    paper_bgcolor: "#FFFFFF",
+    plot_bgcolor: "#FFFFFF",
+    autosize: true,
+
+    // Primary X-axis (bottom)
+    xaxis: {
+        title: { text: "X1", font: { color: "#000000" } },
+        type: "linear",
+        mirror: "ticks",
+        zeroline: false,
+        ticks: "inside",
+        ticklen: 5,
+        tickcolor: "#000000",
+        tickfont: { color: "#000000" },  // Ensures tick labels are black
+        linecolor: "#000000",
+        showgrid: false
+    },
+
+    // Secondary X-axis (top) (Red font)
+    xaxis2: {
+        title: { text: "X2", font: { color: "#FF0000" } }, // Title font in red
+        tickfont: { color: "#FF0000" },  // Tick labels in red
+        type: "linear",
+        mirror: "ticks",
+        overlaying: "free",
+        side: "top", // Positions it at the top
+        zeroline: false,
+        ticks: "inside",
+        ticklen: 5,
+        tickcolor: "#FF0000",
+        linecolor: "#FF0000",
+        anchor: "free",
+        position: 1.0,
+        showgrid: false
+    },
+
+    // Primary Y-axis (left)
+    yaxis: {
+        title: { text: "Y1", font: { color: "#000000" } },
+        tickfont: { color: "#000000" }, // Tick labels in black
+        type: "linear",
+        mirror: "ticks",
+        zeroline: false,
+        ticks: "inside",
+        ticklen: 5,
+        tickcolor: "#000000",
+        linecolor: "#000000",
+        showgrid: false
+    },
+
+    // Secondary Y-axis (right) (Red font)
+    yaxis2: {
+        title: { text: "Y2", font: { color: "#FF0000" } }, // Title font in red
+        tickfont: { color: "#FF0000" },  // Tick labels in red
+        type: "linear",
+        mirror: "ticks",
+        overlaying: "free",
+        side: "right",
+        zeroline: false,
+        ticks: "inside",
+        ticklen: 5,
+        tickcolor: "#FF0000",
+        linecolor: "#FF0000",
+        anchor: "free",
+        position: 1.0,
+        showgrid: false
+    }
+};
 
 
-// Function to handle dropdown selection
+function updatePlotTitles(){
+
+        const x1Title = document.getElementById('plotx1_dropdown').value;
+        const y1Title = document.getElementById('ploty1_dropdown').value;
+        const x2Title = document.getElementById('plotx2_dropdown').value;
+        const y2Title = document.getElementById('ploty2_dropdown').value;
+
+        const newLayout = {
+            "xaxis.title.text": x1Title,
+            "yaxis.title.text": y1Title,
+            "xaxis2.title.text": x2Title,
+            "yaxis2.title.text": y2Title
+        };
+
+        Plotly.relayout('plotlyGraph', newLayout);
+}
+
 function plotDropDownChanged(event) {
     const selectedIndex = event.target.selectedIndex;
     console.log(`Dropdown ${event.target.id} selected value: ${event.target.value}, index: ${selectedIndex}`);
@@ -57,19 +113,35 @@ function plotDropDownChanged(event) {
     if(extracted == "x1"){
         pltIndexX = selectedIndex;
         updatePlot = true; 
-    }else if(extracted == "y1"){
+    } else if(extracted == "y1"){
         pltIndexY = selectedIndex;
-        updatePlot= true; 
+        updatePlot = true; 
+    } else if(extracted == "x2"){
+        pltIndexX2 = selectedIndex;  // Added for second line
+        updatePlot = true;
+    } else if(extracted == "y2"){
+        pltIndexY2 = selectedIndex;  // Added for second line
+        updatePlot = true;
     }
 
     if(updatePlot){
-        let xData = Array.from(getColumnUpToRow(float64Array, pltIndexX, dataIndex-1, f64cols));
-        let yData = Array.from(getColumnUpToRow(float64Array, pltIndexY, dataIndex-1, f64cols));
-        xData = movingAverageDownsample(xData, maxPlotPoints/2);
-        yData = movingAverageDownsample(yData, maxPlotPoints/2);
-        replacePlotData(xData, yData)
+        let xData1 = Array.from(getColumnUpToRow(float64Array, pltIndexX, dataIndex-1, f64cols));
+        let yData1 = Array.from(getColumnUpToRow(float64Array, pltIndexY, dataIndex-1, f64cols));
+        let xData2 = Array.from(getColumnUpToRow(float64Array, pltIndexX2, dataIndex-1, f64cols));
+        let yData2 = Array.from(getColumnUpToRow(float64Array, pltIndexY2, dataIndex-1, f64cols));
+
+        xData1 = movingAverageDownsample(xData1, maxPlotPoints / 2);
+        yData1 = movingAverageDownsample(yData1, maxPlotPoints / 2);
+        xData2 = movingAverageDownsample(xData2, maxPlotPoints / 2);
+        yData2 = movingAverageDownsample(yData2, maxPlotPoints / 2);
+
+        replacePlotData(xData1, yData1, xData2, yData2);
+        updatePlotTitles();
+
+
     }
 }
+
 
 // Get all dropdowns by class
 document.querySelectorAll('.plot_dropdown').forEach(dropdown => {
@@ -111,26 +183,46 @@ function set_dropdown_options(){
 
     if (plotx1_dropdown.options.length > pltIndexX) plotx1_dropdown.selectedIndex = pltIndexX;
     if (ploty1_dropdown.options.length > pltIndexY) ploty1_dropdown.selectedIndex = pltIndexY;
-    // if (plotx2_dropdown.options.length > defaultIndex) plotx2_dropdown.selectedIndex = defaultIndex;
-    // if (ploty2_dropdown.options.length > defaultIndex) ploty2_dropdown.selectedIndex = defaultIndex;
+    if (plotx2_dropdown.options.length > pltIndexX2) plotx2_dropdown.selectedIndex = pltIndexX2;
+    if (ploty2_dropdown.options.length > pltIndexY2) ploty2_dropdown.selectedIndex = pltIndexY2;
+
 
 }
 
 
 function createPlot() {
     set_dropdown_options();
-    const data = [{
-        x: [],
-        y: [],
-        type: 'scattergl',
-        mode: 'lines+markers',
-        name: 'Serial Data',
-        line: { color: "#000000", width: 2 }, // Black lines for better visibility
-        marker: { color: "#000000", size: 6 } // Black markers with a moderate size
-    }];
+
+    const data = [
+        {
+            x: [],
+            y: [],
+            type: 'scattergl',
+            mode: 'lines+markers',
+            name: 'Line 1',
+            line: { color: "#000000", width: 2 },
+            marker: { color: "#000000", size: 6 },
+            xaxis: 'x',
+            yaxis: 'y'
+        },
+        {
+            x: [],
+            y: [],
+            type: 'scattergl',
+            mode: 'lines+markers',
+            name: 'Line 2',
+            line: { color: "#FF0000", width: 2 },
+            marker: { color: "#FF0000", size: 6 },
+            xaxis: 'x2',
+            yaxis: 'y2'
+        }
+    ];
 
     Plotly.newPlot('plotlyGraph', data, layout);
+    updatePlotTitles();
+    
 }
+
 
 
 function updatePlot(x, y) {
@@ -147,34 +239,47 @@ function updatePlot(x, y) {
 
 }
 
-function replacePlotData(x, y) {
-
-    if (!x || !y || x.length === 0 || y.length === 0) {
-        console.error("Invalid data: x and y must be non-empty arrays.");
+function replacePlotData(x1, y1, x2, y2) {
+    if (!x1 || !y1 || x1.length === 0 || y1.length === 0 ||
+        !x2 || !y2 || x2.length === 0 || y2.length === 0) {
+        console.error("Invalid data: x1, y1, x2, and y2 must be non-empty arrays.");
         return;
     }
 
-
     const graphDiv = document.getElementById('plotlyGraph');
 
-    // Ensure the Plotly graph exists
     if (!graphDiv) {
         console.error("Plotly graph container not found.");
         return;
     }
 
+    // Update plot with two lines (one using primary axes, the other using secondary axes)
+    Plotly.react('plotlyGraph', [
+        {
+            x: x1,
+            y: y1,
+            type: 'scattergl',
+            mode: 'lines+markers',
+            name: 'Line 1',
+            line: { color: "#000000", width: 2 }, // Black line
+            marker: { color: "#000000", size: 6 },
+            xaxis: 'x',  // Use primary X-axis (bottom)
+            yaxis: 'y'   // Use primary Y-axis (left)
+        },
+        {
+            x: x2,
+            y: y2,
+            type: 'scattergl',
+            mode: 'lines+markers',
+            name: 'Line 2',
+            line: { color: "#FF0000", width: 2 }, // Red line
+            marker: { color: "#FF0000", size: 6 },
+            xaxis: 'x2',  // Use secondary X-axis (top)
+            yaxis: 'y2'   // Use secondary Y-axis (right)
+        }
+    ], layout);
+}
 
-
-    // Replace all data in the graph
-    Plotly.react('plotlyGraph', [{
-        x: x,
-        y: y,
-        type: 'scattergl',
-        mode: 'lines+markers',
-        line: { color: "#000000", width: 2 }, // Black lines for better visibility
-        marker: { color: "#000000", size: 6 } // Black markers with a moderate size
-    }], layout); // Use existing layout
-    }
 
 
 
@@ -215,39 +320,53 @@ function movingAverageDownsample(arr, n) {
 
 
 function plotTimer() {
-    if(!portConnected) return;
+    if (!portConnected) return;
     
-    let  moreX = []
-    let  moreY = []
-    while( dataIndex <  f64rows){
-        let valueX = float64Array[dataIndex * f64cols + pltIndexX];
-        let valueY = float64Array[dataIndex * f64cols + pltIndexY];
-        if(isNaN(valueX) || isNaN(valueY)) {
-            // dataIndex = dataIndex - 1; 
+    let moreX1 = [];
+    let moreY1 = [];
+    let moreX2 = [];
+    let moreY2 = [];
+
+    while (dataIndex < f64rows) {
+        let valueX1 = float64Array[dataIndex * f64cols + pltIndexX];
+        let valueY1 = float64Array[dataIndex * f64cols + pltIndexY];
+        let valueX2 = float64Array[dataIndex * f64cols + pltIndexX2];
+        let valueY2 = float64Array[dataIndex * f64cols + pltIndexY2];
+
+        if (isNaN(valueX1) || isNaN(valueY1) || isNaN(valueX2) || isNaN(valueY2)) {
             break;
         }
-        moreX.push(valueX);
-        moreY.push(valueY);
-        dataIndex = dataIndex + 1; 
+
+        moreX1.push(valueX1);
+        moreY1.push(valueY1);
+        moreX2.push(valueX2);
+        moreY2.push(valueY2);
+
+        dataIndex = dataIndex + 1;
     }
+
     const graphDiv = document.getElementById('plotlyGraph');
 
-    if(graphDiv.data[0].x.length > maxPlotPoints){
-        let xData = Array.from(getColumnUpToRow(float64Array, pltIndexX, dataIndex-1, f64cols));
-        let yData = Array.from(getColumnUpToRow(float64Array, pltIndexY, dataIndex-1, f64cols));
-        xData = movingAverageDownsample(xData, maxPlotPoints/2);
-        yData = movingAverageDownsample(yData, maxPlotPoints/2);
+    if (graphDiv.data[0].x.length > maxPlotPoints) {
+        let xData1 = Array.from(getColumnUpToRow(float64Array, pltIndexX, dataIndex - 1, f64cols));
+        let yData1 = Array.from(getColumnUpToRow(float64Array, pltIndexY, dataIndex - 1, f64cols));
+        let xData2 = Array.from(getColumnUpToRow(float64Array, pltIndexX2, dataIndex - 1, f64cols));
+        let yData2 = Array.from(getColumnUpToRow(float64Array, pltIndexY2, dataIndex - 1, f64cols));
 
+        xData1 = movingAverageDownsample(xData1, maxPlotPoints / 2);
+        yData1 = movingAverageDownsample(yData1, maxPlotPoints / 2);
+        xData2 = movingAverageDownsample(xData2, maxPlotPoints / 2);
+        yData2 = movingAverageDownsample(yData2, maxPlotPoints / 2);
 
-        replacePlotData(xData, yData)
+        replacePlotData(xData1, yData1, xData2, yData2);
     }
 
-
+    // Extend traces for both lines dynamically
     Plotly.extendTraces(graphDiv, {
-        x: [moreX], 
-        y: [moreY]
-    }, [0]);
-
+        x: [moreX1, moreX2], 
+        y: [moreY1, moreY2]
+    }, [0, 1]);
 }
+
 
 const intervalId = setInterval(plotTimer, 300);
