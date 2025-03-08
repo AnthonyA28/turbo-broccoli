@@ -2,7 +2,7 @@ const list = document.getElementById("stringList");
 
 
 const commandAutoComplete = [
-"submit_commandList", "start_commandList", "stop", "set_pos", "set_speed", "move_to"
+"submit_command_list", "start_command_list", "stop", "set_pos", "set_speed", "move_to"
 ];
 
 const input = document.getElementById("commandInput");
@@ -109,7 +109,7 @@ document.getElementById("addCommandBtn").addEventListener("click", addCommand);
 function transformCommand(commandString) {
     const parts = commandString.split(' '); // Split by space
     if (parts.length !== 2) {
-        console.error("no number here");
+        // console.error("no number here");
         return commandString;
     }
 
