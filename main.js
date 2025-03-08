@@ -21,17 +21,21 @@ var commandList = [];
 
 async function setupStore() {
     const { default: Store } = await import('electron-store');
-    store = new Store();
+    
+    store = new Store({
+        cwd: process.cwd(), // Save store in the current working directory
+        name: 'store' // Optional: change the name of the store file
+    });
 
-    const storeFileName = 'store.json'; // Change this to your store file name
-    const storeFilePath = path.join(__dirname, storeFileName);
+    console.log('Store initialized at:', path.join(process.cwd(), 'store.json'));
 
+    // Optional: If you want to merge data from an existing store.json file
+    const storeFilePath = path.join(process.cwd(), 'store.json');
     if (fs.existsSync(storeFilePath)) {
         console.log(`Store file found: ${storeFilePath}`);
         try {
             const storeData = fs.readFileSync(storeFilePath, 'utf8');
             console.log('Store file content:', storeData);
-            // Optionally parse the JSON data and merge it into the store
             const parsedData = JSON.parse(storeData);
             Object.entries(parsedData).forEach(([key, value]) => {
                 console.log("Setting " + key + " to " + value);
@@ -50,6 +54,7 @@ async function setupStore() {
         }
     }
 }
+
 
 // Request data from the renderer
 async function requestRendererData() {

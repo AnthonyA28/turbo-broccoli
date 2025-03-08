@@ -1,6 +1,6 @@
 {
 	"theme": "dark",
-	"portPath": "COM11",
+	"portPath": "COM2",
 	"baudRate": 9600,
 	"dataBits": 8,
 	"stopBits": 0,
@@ -8,15 +8,26 @@
 	"parity": "none",
 	"flowControl": "true",
 	"delimiter": "\\n",
-	"folderPath": "C:\\Users\\antho\\Downloads\\log",
-	"fileName": "2025-02-12--01-20-35.csv",
-	"dataFileName": "data_2025-02-12--01-20-35.csv",
+	"folderPath": "C:\\Users\\antho\\Downloads",
+	"fileName": "2025-03-08--00-22-12.csv",
+	"dataFileName": "data_2025-03-08--00-22-12.csv",
 	"ticks_per_second": 1000,
 	"steps_per_micron": 10,
 	"force_base_line1": 8698601,
 	"force_slope1": 0.0000894,
 	"force_base_line2": 8509324,
 	"force_slope2": 0.0000929,
-    "column_names": ["Target pos[μm]", "speed [μm]", "position [μm]", "time [s]", "Force1 [N]", "Force2 [N]", "parse_command_list", "run_command_list","command_done","command_list_current_index","command_list_index"]
-
+	"column_names": [
+		"Target pos[μm]",
+		"speed [μm]",
+		"position [μm]",
+		"time [s]",
+		"Force1 [N]",
+		"Force2 [N]",
+		"parse_command_list",
+		"run_command_list",
+		"command_done",
+		"command_list_current_index",
+		"command_list_index"
+	]
 }

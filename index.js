@@ -151,12 +151,7 @@ async function connectDisconnect() {
 
 
 async function chooseFolder(){
-    const logDataCheckbox = document.getElementById('logDataCheckbox');
-    const isLoggingEnabled = logDataCheckbox.checked;
-    if(!isLoggingEnabled){
-        window.electronAPI.chooseLogFolder("");
-        return;
-    }
+    window.electronAPI.chooseLogFolder("");
     const fileName = document.getElementById('fileName').value ;
     await window.electronAPI.chooseLogFolder(fileName);
 }
