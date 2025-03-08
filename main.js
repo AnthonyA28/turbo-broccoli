@@ -186,33 +186,6 @@ ipcMain.handle('choose-log-folder', async (event, fileName) => {
         const folderPath = result.filePaths[0];
         store.set("folderPath", folderPath);
 
-        let filePath = path.join(folderPath, fileName);
-        store.set("fileName", fileName);
-        
-        const dataFileName = "data_" + fileName
-        let dataFilePath = path.join(folderPath, dataFileName);
-        store.set("dataFileName", dataFileName);
-
-        try {
-            // Create a text file with the specified name
-            fs.writeFileSync(filePath, '');
-            console.log(`File created successfully at ${filePath}`);
-
-            
-        } catch (error) {
-            filePath = "";
-            console.log(`Error creating file: ${error.message}`);
-        }
-
-        try {
-            // Create a text file with the specified name
-            fs.writeFileSync(dataFilePath, '');
-            console.log(`File created successfully at ${dataFilePath}`);
-        } catch (error) {
-            dataFilePath = "";
-            console.log(`Error creating file: ${error.message}`);
-        }
-
 });
 
 
@@ -236,6 +209,11 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
       currentPort.on('open', () => {
         console.log('Serial port opened');
         store.set("portPath", currentPort.path);
+        
+        const header = store.get("column_names");
+        const logHeader = ["Raw Serial Data"];
+        console.log("Logging " + header);
+        logData(logHeader, header);
       });
 
       currentPort.on('error', (err) => {
@@ -246,19 +224,27 @@ ipcMain.handle('connect-serial-port', async (event, config) => {
       currentParser.on('data', (data) => {
         console.log(`Received data: ${data}`);
 
-        const parsedData = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
+        const parsedDataCopy = data.replace(/[\[\]]/g, '').split(';').map(num => parseFloat(num.trim()));
+        var parsedData = structuredClone(parsedDataCopy);
+
 
         if (parsedData.length != numIndices) {
             return;
         }
 
 
-        parsedData[0] = parsedData[0]/store.get("steps_per_micron");
-        parsedData[1] = parsedData[1]/store.get("steps_per_micron");
-        parsedData[2] = parsedData[2]/store.get("steps_per_micron");
-        parsedData[3] = parsedData[3]/store.get("ticks_per_second");
-        parsedData[4] = (parsedData[4]-store.get("force_base_line1"))*store.get("force_slope1");
-        parsedData[5] = (parsedData[5]-store.get("force_base_line2"))*store.get("force_slope2");
+        parsedData[0] = parsedDataCopy[2]/store.get("steps_per_micron");
+        parsedData[1] = (parsedDataCopy[4]-store.get("force_base_line1"))*store.get("force_slope1");
+        parsedData[2] = (parsedDataCopy[5]-store.get("force_base_line2"))*store.get("force_slope2");
+        parsedData[3] = parsedDataCopy[0]/store.get("steps_per_micron");
+        parsedData[4] = parsedDataCopy[1]/store.get("steps_per_micron");
+        parsedData[5] = parsedDataCopy[3]/store.get("ticks_per_second");
+        
+        parsedData[6] = parsedDataCopy[6];
+        parsedData[7] = parsedDataCopy[7];
+        parsedData[8] = parsedDataCopy[8];
+        parsedData[9] = parsedDataCopy[9];
+        parsedData[10] = parsedDataCopy[10];
 
         logData(data, parsedData);
           
@@ -280,6 +266,7 @@ async function logData(data, parsedData){
 
     const filePath = path.join(store.get("folderPath"), store.get("fileName"));
     const dataFilePath = path.join(store.get("folderPath"), store.get("dataFileName"));
+    console.log(filePath);
     if(filePath != ""){
         try {
 

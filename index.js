@@ -18,6 +18,19 @@ let storeObj = {};
 // 9   command_list_current_index 
 // 10  command_list_index
 
+// Index   Interpreted
+// 0   steps
+// 1   Force 1 -- HX711_Read()
+// 2   Force 2 -- HX711_Read2()
+// 3   target_pos
+// 4   speed
+// 5   HAL_GetTick()
+// 6   parse_command_list
+// 7   run_command_list
+// 8   command_done
+// 9   command_list_current_index 
+// 10  command_list_index
+
 
 function portConnected(){
     return document.getElementById("connectButton").innerHTML == "Disconnect"
@@ -110,6 +123,11 @@ async function connectDisconnect() {
 
 
     console.log('Delimiter:', JSON.stringify(delimiter));
+
+    let storeObj = {};
+    storeObj.fileName = document.getElementById('fileName').value;
+    storeObj.dataFileName = "data_" + storeObj.fileName;
+    window.electronAPI.setStore(storeObj);
 
     const connectionSucessful = await electronAPI.connectSerialPort({
         path: portName,

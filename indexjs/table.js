@@ -54,7 +54,7 @@ function loadTable() {
         sortable: false,
         filter: false,
         resizable: true,
-        menuTabs: ['generalMenuTab', 'columnsMenuTab'],
+        // menuTabs: ['generalMenuTab', 'columnsMenuTab'],
     }));
 
     gridOptions.columnDefs = columnDefs; 

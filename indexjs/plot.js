@@ -1,8 +1,8 @@
 
-let pltIndexX = 3; 
-let pltIndexY = 4;
-let pltIndexX2 = 3; 
-let pltIndexY2 = 5;
+let pltIndexX = 5; 
+let pltIndexY = 1;
+let pltIndexX2 = 5; 
+let pltIndexY2 = 2;
 const maxPlotPoints = 10000;
 const xData = [];
 const yData = [];
