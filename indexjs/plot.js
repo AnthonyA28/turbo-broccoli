@@ -23,7 +23,7 @@ const layout = {
     xaxis: {
         title: { text: "X1", font: { color: "#000000" } },
         type: "linear",
-        mirror: "ticks",
+        mirror: "false",
         zeroline: false,
         ticks: "inside",
         ticklen: 5,
@@ -38,8 +38,8 @@ const layout = {
         title: { text: "X2", font: { color: "#FF0000" } }, // Title font in red
         tickfont: { color: "#FF0000" },  // Tick labels in red
         type: "linear",
-        mirror: "ticks",
-        overlaying: "free",
+        mirror: "fasle",
+        overlaying: "x",
         side: "top", // Positions it at the top
         zeroline: false,
         ticks: "inside",
@@ -56,7 +56,7 @@ const layout = {
         title: { text: "Y1", font: { color: "#000000" } },
         tickfont: { color: "#000000" }, // Tick labels in black
         type: "linear",
-        mirror: "ticks",
+        mirror: "false",
         zeroline: false,
         ticks: "inside",
         ticklen: 5,
@@ -70,8 +70,8 @@ const layout = {
         title: { text: "Y2", font: { color: "#FF0000" } }, // Title font in red
         tickfont: { color: "#FF0000" },  // Tick labels in red
         type: "linear",
-        mirror: "ticks",
-        overlaying: "free",
+        mirror: "false",
+        overlaying: "y",
         side: "right",
         zeroline: false,
         ticks: "inside",
