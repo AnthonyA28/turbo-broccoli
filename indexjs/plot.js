@@ -197,7 +197,7 @@ function createPlot() {
         {
             x: [],
             y: [],
-            type: 'scattergl',
+            type: 'scatter',
             mode: 'lines+markers',
             name: 'Line 1',
             line: { color: "#000000", width: 2 },
@@ -208,7 +208,7 @@ function createPlot() {
         {
             x: [],
             y: [],
-            type: 'scattergl',
+            type: 'scatter',
             mode: 'lines+markers',
             name: 'Line 2',
             line: { color: "#FF0000", width: 2 },
@@ -258,7 +258,7 @@ function replacePlotData(x1, y1, x2, y2) {
         {
             x: x1,
             y: y1,
-            type: 'scattergl',
+            type: 'scatter',
             mode: 'lines+markers',
             name: 'Line 1',
             line: { color: "#000000", width: 2 }, // Black line
@@ -269,7 +269,7 @@ function replacePlotData(x1, y1, x2, y2) {
         {
             x: x2,
             y: y2,
-            type: 'scattergl',
+            type: 'scatter',
             mode: 'lines+markers',
             name: 'Line 2',
             line: { color: "#FF0000", width: 2 }, // Red line

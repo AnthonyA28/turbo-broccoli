@@ -7,7 +7,7 @@
     "icon": "assets/icon"
   },
   "scripts": {
-    "start": "electron ."
+    "start": "electron . --no-sandbox"
   },
   "dependencies": {
     "electron": "^24.0.0",
