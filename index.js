@@ -129,6 +129,7 @@ async function connectDisconnect() {
         section.classList.add('locked');
         document.getElementById("connectButton").innerHTML = "Disconnect"
         
+        let storeObj = {};
         storeObj.baudRate = baudRate;
         storeObj.dataBits = dataBits;
         storeObj.stopBits = stopBits;

@@ -38,16 +38,19 @@ async function setupStore() {
             console.log('Store file content:', storeData);
             const parsedData = JSON.parse(storeData);
             Object.entries(parsedData).forEach(([key, value]) => {
-                console.log("Setting " + key + " to " + value);
-                store.set(key, value);
+                if (!store.has(key)) {
+                    console.log("Setting " + key + " to " + value);
+                    store.set(key, value);
+                }
             });
+
         } catch (error) {
             console.error('Error reading store file:', error);
         }
     } else {
         console.log(`Store file not found in the current directory. Creating a new store...`);
         try {
-            fs.writeFileSync(storeFilePath, JSON.stringify(store.store, null, 2));
+            // fs.writeFileSync(storeFilePath, JSON.stringify(store.store, null, 2));
             console.log('New store file created:', storeFilePath);
         } catch (error) {
             console.error('Error creating store file:', error);
@@ -122,11 +125,25 @@ ipcMain.handle('disconnect-serial-port', async () => {
 });
 
 
-ipcMain.handle('set-store', async(event, newStoreObj) => {
-    const existingStore = store.store; // Get current store values
-    const updatedStore = { ...existingStore, ...newStoreObj }; // Merge new data
-    store.set(updatedStore);
-})
+ipcMain.handle('set-store', async (event, newStoreObj) => {
+    if (!newStoreObj || typeof newStoreObj !== 'object') {
+        console.warn('Invalid store update request:', newStoreObj);
+        return;
+    }
+
+    // Only update keys that exist in the current store
+    Object.entries(newStoreObj).forEach(([key, value]) => {
+        if (store.has(key)) { // Ensure the key exists before updating
+            console.log(`Updating store: ${key} -> ${value}`);
+            store.set(key, value);
+        } else {
+            console.warn(`Skipping unknown key: ${key}`);
+        }
+    });
+
+    store.store = { ...store.store }; // Ensure persistence
+    console.log('Updated store state:', store.store);
+});
 
 
 ipcMain.handle('set-newCommandList', async (event, newCommandList) => {
