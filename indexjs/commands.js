@@ -109,8 +109,8 @@ document.getElementById("addCommandBtn").addEventListener("click", addCommand);
 function transformCommand(commandString) {
     const parts = commandString.split(' '); // Split by space
     if (parts.length !== 2) {
-        console.error("Invalid command format");
-        return null;
+        console.error("no number here");
+        return commandString;
     }
 
     const command = parts[0]; // First part is the command
