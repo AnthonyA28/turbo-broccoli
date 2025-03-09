@@ -38,7 +38,7 @@ const layout = {
         title: { text: "X2", font: { color: "#FF0000" } }, // Title font in red
         tickfont: { color: "#FF0000" },  // Tick labels in red
         type: "linear",
-        mirror: "fasle",
+        mirror: "false",
         overlaying: "x",
         side: "top", // Positions it at the top
         zeroline: false,
@@ -198,7 +198,7 @@ function createPlot() {
             x: [],
             y: [],
             type: 'scatter',
-            mode: 'lines+markers',
+            mode: 'lines',
             name: 'Line 1',
             line: { color: "#000000", width: 2 },
             marker: { color: "#000000", size: 6 },
@@ -209,7 +209,7 @@ function createPlot() {
             x: [],
             y: [],
             type: 'scatter',
-            mode: 'lines+markers',
+            mode: 'lines',
             name: 'Line 2',
             line: { color: "#FF0000", width: 2 },
             marker: { color: "#FF0000", size: 6 },
@@ -259,7 +259,7 @@ function replacePlotData(x1, y1, x2, y2) {
             x: x1,
             y: y1,
             type: 'scatter',
-            mode: 'lines+markers',
+            mode: 'lines',
             name: 'Line 1',
             line: { color: "#000000", width: 2 }, // Black line
             marker: { color: "#000000", size: 6 },
@@ -270,7 +270,7 @@ function replacePlotData(x1, y1, x2, y2) {
             x: x2,
             y: y2,
             type: 'scatter',
-            mode: 'lines+markers',
+            mode: 'lines',
             name: 'Line 2',
             line: { color: "#FF0000", width: 2 }, // Red line
             marker: { color: "#FF0000", size: 6 },
