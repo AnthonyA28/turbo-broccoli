@@ -3,7 +3,7 @@ let pltIndexX = 5;
 let pltIndexY = 1;
 let pltIndexX2 = 5; 
 let pltIndexY2 = 2;
-const maxPlotPoints = 10000;
+const maxPlotPoints = 1000;
 const xData = [];
 const yData = [];
 let dataIndex = 0; 
@@ -301,21 +301,24 @@ window.addEventListener('resize', () => {
 function movingAverageDownsample(arr, n) {
     if (arr.length <= n) return Array.from(arr); // No need to downsample
 
-    const step = Math.floor(arr.length / n); // Compute step size
+    const step = arr.length / n; // Use float step to distribute points more evenly
     const result = [];
 
     for (let i = 0; i < n; i++) {
-        const start = i * step;
-        const end = Math.min(start + step, arr.length);
+        const start = Math.round(i * step);
+        const end = Math.round((i + 1) * step);
+        
+        if (start >= arr.length) break; // Safety check
 
         // Compute the average over this range
-        const avg = arr.slice(start, end).reduce((sum, val) => sum + val, 0) / (end - start);
+        const slice = arr.slice(start, end);
+        const avg = slice.reduce((sum, val) => sum + val, 0) / slice.length;
+
         result.push(avg);
     }
 
     return result;
 }
-
 
 
 
